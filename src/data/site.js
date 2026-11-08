@@ -10,8 +10,8 @@ export const site = {
 }
 
 export const nav = [
-  { label: 'About', to: '/profile' },
   { label: 'Work', to: '/work' },
+  { label: 'Profile', to: '/profile' },
   { label: 'Atelier', to: '/atelier' },
 ]
 

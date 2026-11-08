@@ -14,7 +14,7 @@ function Header() {
 
   return (
     <header className="absolute inset-x-0 top-0 z-20 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page font-nav text-[14px] tracking-[-0.006em] text-black sm:text-nav">
-      <Link to="/" className={link}>{site.brand}</Link>
+      <Link to="/" className={`${link} uppercase`}>{site.brand}</Link>
       <nav aria-label="Primary" className="flex items-center gap-3 sm:gap-8 lg:gap-12">
         {nav.map((item) => (
           <NavLink key={item.to} to={item.to} className={link}>{item.label}</NavLink>
