@@ -1,9 +1,57 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+@font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Regular.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Medium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Italic.otf") format("opentype"); font-weight: 400; font-style: italic; font-display: swap; }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Neue Montreal", ui-sans-serif, system-ui, sans-serif;
+  --font-nav: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Momo Signature", cursive;
+
+  --color-page: #fafafa;
+  --color-page-warm: #fbfbf8;
+  --color-ink: #131313;
+  --color-copy: #171717;
+  --color-muted: #636363;
+  --color-soft: #767676;
+  --color-faint: #8a8a8a;
+  --color-stone: #f1eee9;
+  --color-mist: #f3f3f3;
+  --color-night: #131313;
+  --color-void: #0a0a0a;
+
+  /* Type: Figma size at 1512, scaling down fluidly */
+  --text-display: clamp(2.5rem, 4.233vw, 4rem);
+  --text-title: clamp(2.25rem, 3.704vw, 3.5rem);
+  --text-h1: clamp(2rem, 3.175vw, 3rem);
+  --text-h2: clamp(1.75rem, 2.646vw, 2.5rem);
+  --text-h3: clamp(1.625rem, 2.117vw, 2rem);
+  --text-lead: clamp(1.25rem, 1.852vw, 1.75rem);
+  --text-body-lg: clamp(1.125rem, 1.587vw, 1.5rem);
+  --text-base-lg: 1.25rem;
+  --text-nav: 1rem;
+
+  /* Case study reading column and page gutter */
+  --spacing-measure: 40rem;
+  --spacing-page: clamp(1rem, 3.175vw, 3rem);
 }
 
-html {
-  color-scheme: light dark;
+html { background: var(--color-page); }
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
