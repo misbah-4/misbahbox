@@ -17,13 +17,13 @@ function Hero() {
 
 function Intro() {
   return (
-    <section className="bg-night text-white">
-      <div className="mx-auto flex max-w-[1512px] flex-col items-center gap-10 px-page py-20 min-[1180px]:h-[760px] min-[1180px]:flex-row min-[1180px]:items-start min-[1180px]:justify-center min-[1180px]:gap-0 min-[1180px]:py-0 min-[1180px]:pr-0 min-[1180px]:pl-[clamp(0px,calc((100vw-1280px)*0.39),90px)] min-[1180px]:pt-[176px]">
-        <h1 data-reveal className="text-h1 font-medium leading-[1.28] tracking-[0.16px] min-[1180px]:mr-14 min-[1180px]:mt-[126px] min-[1180px]:w-[288px] min-[1180px]:whitespace-nowrap">
+    <section className="@container bg-night text-white">
+      <div className="relative mx-auto flex max-w-[1512px] flex-col items-center gap-10 px-page py-20 [--u:min(100cqw/1512,1px)] md:block md:h-[calc(var(--u)*760)] md:p-0">
+        <h1 data-reveal className="text-h1 font-medium leading-[1.28] tracking-[0.16px] md:absolute md:left-[calc(var(--u)*256)] md:top-[calc(var(--u)*302)] md:whitespace-nowrap md:text-[calc(var(--u)*48)]">
           Hi, I’m <em className="font-normal">Misbah</em>
         </h1>
-        <img data-reveal src={`${P}/intro-card.png`} alt="Portfolio page preview" width="295" height="347" className="h-[347px] w-[295px] shrink-0 rounded-[2.5px] object-cover" />
-        <p data-reveal className="max-w-[386px] text-center text-lead leading-[1.2] tracking-[0.01em] text-[#f5f5f5] min-[1180px]:ml-16 min-[1180px]:mt-[113px] min-[1180px]:text-left">
+        <img data-reveal src={`${P}/intro-card.png`} alt="Portfolio page preview" width="295" height="347" className="h-[347px] w-[295px] rounded-[2.5px] object-cover md:absolute md:left-[calc(var(--u)*600)] md:top-[calc(var(--u)*176)] md:h-[calc(var(--u)*347)] md:w-[calc(var(--u)*295)]" />
+        <p data-reveal className="max-w-[386px] text-center text-lead leading-[1.2] tracking-[0.01em] text-[#f5f5f5] md:absolute md:left-[calc(var(--u)*959)] md:top-[calc(var(--u)*289)] md:w-[calc(var(--u)*386)] md:max-w-none md:text-left md:text-[calc(var(--u)*28)]">
           I am a Designer and Developer focused on bringing intuitive concepts to life.
         </p>
       </div>
@@ -44,7 +44,7 @@ function Focus() {
 function Philosophy() {
   return (
     <section className="flex justify-center px-page py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
-      <p data-reveal className="max-w-[743px] -translate-x-[8.5px] text-center text-h1 leading-[1.53] tracking-normal text-black">
+      <p data-reveal className="max-w-[15.48em] -translate-x-[8.5px] text-center text-h1 leading-[1.53] tracking-normal text-black">
         My work is rooted in{' '}
         <span className="relative whitespace-pre font-script">
           {'minimalism           '}
