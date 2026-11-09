@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { nav, site } from '../data/site.js'
 import { scrollToTarget, setScrollLocked } from '../lib/motion.js'
@@ -12,6 +12,23 @@ const MENU_LINK_DELAY = 80
 const MENU_BREAKPOINT = '(min-width: 768px)'
 const SCROLL_THRESHOLD = 8
 const ALWAYS_VISIBLE_ZONE = 80
+const HEADER_CENTRE_Y = 39
+const DARK_BELOW = 128
+
+// Finds the first solid background behind the header, ignoring pictures.
+function isDarkBehindHeader(header) {
+  const stack = document.elementsFromPoint(window.innerWidth / 2, HEADER_CENTRE_Y)
+
+  for (const element of stack) {
+    if (header.contains(element) || element.tagName === 'IMG' || element.tagName === 'CANVAS') continue
+    const channels = getComputedStyle(element).backgroundColor.match(/^rgba?\(([^)]+)\)/)?.[1].split(/[ ,/]+/).map(Number)
+    if (!channels || (channels.length > 3 && channels[3] < 0.5)) continue
+    const [red, green, blue] = channels
+    return 0.299 * red + 0.587 * green + 0.114 * blue < DARK_BELOW
+  }
+
+  return false
+}
 
 function MenuIcon({ open }) {
   const line = 'absolute left-1/2 top-1/2 -ml-2.5 -mt-[0.75px] h-[1.5px] w-5 bg-current transition-transform duration-300 ease-out'
@@ -27,12 +44,26 @@ function MenuIcon({ open }) {
 function Header() {
   const [open, setOpen] = useState(false)
   const [scrolledAway, setScrolledAway] = useState(false)
+  const [overDark, setOverDark] = useState(false)
+  const headerRef = useRef(null)
 
   // Slides away while scrolling down and returns as soon as the visitor scrolls up.
   useEffect(() => {
     let last = window.scrollY
+    let queued = false
+
+    const checkBackground = () => {
+      queued = false
+      setOverDark(isDarkBehindHeader(headerRef.current))
+    }
+    const queueBackgroundCheck = () => {
+      if (queued) return
+      queued = true
+      requestAnimationFrame(checkBackground)
+    }
 
     const onScroll = () => {
+      queueBackgroundCheck()
       const current = window.scrollY
       const moved = current - last
       if (Math.abs(moved) < SCROLL_THRESHOLD) return
@@ -40,8 +71,13 @@ function Header() {
       last = current
     }
 
+    queueBackgroundCheck()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', queueBackgroundCheck)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', queueBackgroundCheck)
+    }
   }, [])
 
   const setMenu = (next) => {
@@ -87,8 +123,7 @@ function Header() {
 
   return (
     <>
-    {/* White plus difference blending reads black on light sections and white on dark ones. */}
-    <header className={`pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page font-nav text-[14px] tracking-[-0.006em] text-white mix-blend-difference transition-transform duration-300 ease-out focus-within:translate-y-0 motion-reduce:transition-none sm:text-nav [&>*]:pointer-events-auto ${scrolledAway && !open ? '-translate-y-full' : 'translate-y-0'}`}>
+    <header ref={headerRef} className={`pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page text-[14px] tracking-[-0.006em] transition-[translate,color] duration-300 ease-out focus-within:translate-y-0 motion-reduce:transition-none sm:text-nav [&>*]:pointer-events-auto ${scrolledAway && !open ? '-translate-y-full' : 'translate-y-0'} ${open || overDark ? 'text-white' : 'text-black'}`}>
       <Link to="/" onClick={() => setMenu(false)} className={`${link} relative z-10 font-bold uppercase before:absolute before:-inset-x-2 before:-inset-y-3`}>{site.brand}</Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-8 md:flex lg:gap-12">

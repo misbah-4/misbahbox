@@ -25,11 +25,11 @@ export const selectedWorks = [
 ]
 
 export const sideProjects = [
-  { label: 'Browser extension design inspection tools', href: 'https://github.com/misbah-4/design-inspector' },
-  { label: 'Design Engineer Workflow Tracker' },
-  { label: 'Moodtip Figma Plugin: Annotate your design taste on figma', href: 'https://github.com/misbah-4/Moodtip' },
-  { label: 'Handson' },
-  { label: 'Football Manager', href: 'https://playpitchcraft.vercel.app' },
+  { label: 'Kanvas: Browser extension for inspecting designs', href: 'https://github.com/misbah-4/design-inspector' },
+  { label: 'Benchwork: Workflow tracker for design engineers', href: 'https://usebenchwork.vercel.app' },
+  { label: 'Moodmakr: Figma plugin for annotating your design taste', href: 'https://github.com/misbah-4/Moodtip' },
+  { label: 'PitchCraft: Football manager game', href: 'https://playpitchcraft.vercel.app' },
+  { label: 'Handson: Machine learning project' },
 ]
 
 // Move a quote into approvedTestimonials only after the person quoted has signed off on the wording.
