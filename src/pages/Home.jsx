@@ -1,9 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ArrowLink from '../components/ArrowLink.jsx'
 import ScaledStage from '../components/ScaledStage.jsx'
-import { selectedWorks, sideProjects } from '../data/site.js'
-import { gsap, prefersReducedMotion, useGSAP } from '../lib/motion.js'
+import { moodboardLabel, selectedWorks, sideProjects } from '../data/site.js'
+import { Draggable, gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from '../lib/motion.js'
 
 const SHOWCASE = [
   { left: 0, top: 44, w: 110.469, h: 93.753, depth: 18, layers: [{ src: 'card-1' }], dark: true },
@@ -25,40 +25,136 @@ const SHOWCASE = [
   },
 ]
 
+// Each card crosses the stage in this many seconds, on the front half of an orbit.
+const CROSSING = 2.4
+const ORBIT_RADIUS = 430
+const STAGE = { width: 575, height: 337 }
+
+const centerY = ({ top, h }) => top + h / 2 - STAGE.height / 2
+
+const STREAM = [
+  ...SHOWCASE.map((card) => ({ ...card, y: centerY(card) })),
+  ...[3, 0, 4, 1, 5, 2].map((index) => ({ ...SHOWCASE[index], y: -centerY(SHOWCASE[index]) })),
+]
+
+// After the stream empties, the deck cuts through these, then the stream returns.
+const DECK = { width: 206, height: 300, beat: 0.55, enter: 0.3, exit: 0.25 }
+const DECK_CARDS = [
+  { src: 'card-5', rotate: -1.5 },
+  { src: 'card-2', rotate: 1.2 },
+  { src: 'card-6', rotate: -0.8 },
+  { src: 'card-3', rotate: 1.8 },
+  { src: 'card-4', rotate: -1.2 },
+  { src: 'card-1', rotate: 0.9 },
+]
+const STREAM_DURATION = CROSSING * (1 + (STREAM.length - 1) / STREAM.length)
+const DECK_DURATION = DECK.beat * DECK_CARDS.length
+const CYCLE_DURATION = STREAM_DURATION + DECK_DURATION
+
+// Words sit across the deck's edges: dark on the page, white where they cross the images.
+function DeckLabel({ className }) {
+  const [before, after] = moodboardLabel
+
+  return (
+    <div className={`absolute inset-0 text-[14px] uppercase leading-none ${className}`}>
+      <span className="absolute left-[-44px] top-1/2 -translate-y-1/2 whitespace-nowrap">{before}</span>
+      <span className="absolute left-[151px] top-1/2 -translate-y-1/2 whitespace-nowrap">{after}</span>
+    </div>
+  )
+}
+
 function Showcase() {
   const scope = useRef(null)
+  const [reduced] = useState(prefersReducedMotion)
+  const slots = reduced ? SHOWCASE : STREAM
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return
+      if (reduced) return undefined
 
-      gsap.from('[data-card]', { autoAlpha: 0, scale: 0.94, duration: 0.9, ease: 'power3.out', stagger: 0.06 })
-      gsap.utils.toArray('[data-card]').forEach((card) => {
-        gsap.to(card, {
-          y: -Number(card.dataset.depth),
-          ease: 'none',
-          scrollTrigger: { trigger: scope.current, start: 'top top', end: 'bottom top', scrub: true },
-        })
+      const cards = gsap.utils.toArray('[data-card]')
+      const deck = scope.current.querySelector('[data-deck]')
+      const deckCards = gsap.utils.toArray('[data-deck-card]')
+      let elapsed = 0
+      let active = true
+
+      const trigger = ScrollTrigger.create({
+        trigger: scope.current,
+        start: 'top bottom',
+        end: 'bottom top',
+        onToggle: (self) => {
+          active = self.isActive
+        },
       })
+
+      const tick = (_time, deltaTime) => {
+        if (!active) return
+        elapsed += deltaTime / 1000
+        const time = elapsed % CYCLE_DURATION
+        const deckTime = time - STREAM_DURATION
+
+        if (deckTime >= 0) {
+          const current = Math.min(Math.floor(deckTime / DECK.beat), deckCards.length - 1)
+          const entering = gsap.utils.clamp(0, 1, deckTime / DECK.enter)
+          const leaving = gsap.utils.clamp(0, 1, (DECK_DURATION - deckTime) / DECK.exit)
+          const presence = gsap.parseEase('power2.out')(Math.min(entering, leaving))
+
+          deck.style.visibility = 'visible'
+          deck.style.opacity = presence
+          deck.style.transform = `scale(${0.92 + 0.08 * presence})`
+          deckCards.forEach((card, index) => {
+            card.style.zIndex = deckCards.length - ((current - index + deckCards.length) % deckCards.length)
+          })
+        } else {
+          deck.style.visibility = 'hidden'
+        }
+
+        cards.forEach((card, index) => {
+          const travelled = time / CROSSING - index / cards.length
+          if (travelled < 0 || travelled >= 1) {
+            card.style.visibility = 'hidden'
+            return
+          }
+
+          const angle = travelled * Math.PI
+          const scale = Math.sin(angle) ** 1.4
+          const x = Math.cos(angle) * ORBIT_RADIUS
+          const y = Number(card.dataset.y) * scale
+
+          card.style.visibility = 'visible'
+          card.style.zIndex = Math.round(scale * 100)
+          card.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+        })
+      }
+
+      gsap.ticker.add(tick)
+      return () => {
+        gsap.ticker.remove(tick)
+        trigger.kill()
+      }
     },
     { scope },
   )
 
   return (
     <div ref={scope} className="px-page pt-[102px]">
-      <ScaledStage width={575} height={337}>
-        {SHOWCASE.map(({ left, top, w, h, depth, layers, dark }) => (
+      <ScaledStage width={STAGE.width} height={STAGE.height}>
+        {slots.map(({ left, top, w, h, y, layers, dark }, index) => (
           <div
-            key={`${left}-${top}`}
+            key={index}
             data-card
-            data-depth={depth}
+            data-y={y}
             className={`absolute overflow-hidden rounded-[1px] ${dark ? 'bg-[#141414]' : ''}`}
-            style={{ left, top, width: w, height: h }}
+            style={
+              reduced
+                ? { left, top, width: w, height: h }
+                : { left: '50%', top: '50%', width: w, height: h, marginLeft: -w / 2, marginTop: -h / 2, visibility: 'hidden', willChange: 'transform' }
+            }
           >
             {layers.map(({ src, style }) => (
               <img
                 key={src}
-                src={`/images/home/${src}.png`}
+                src={`/images/home/${src}.webp`}
                 alt=""
                 className={`absolute ${style ? '' : 'inset-0 size-full object-cover'}`}
                 style={style}
@@ -66,6 +162,27 @@ function Showcase() {
             ))}
           </div>
         ))}
+        {!reduced && (
+          <div
+            data-deck
+            aria-hidden="true"
+            className="absolute left-1/2 top-1/2 invisible will-change-transform"
+            style={{ width: DECK.width, height: DECK.height, marginLeft: -DECK.width / 2, marginTop: -DECK.height / 2 }}
+          >
+            <DeckLabel className="z-0 text-ink" />
+            {DECK_CARDS.map(({ src, rotate }) => (
+              <img
+                key={src}
+                data-deck-card
+                src={`/images/home/${src}.webp`}
+                alt=""
+                className="absolute inset-0 size-full object-cover"
+                style={{ rotate: `${rotate}deg` }}
+              />
+            ))}
+            <DeckLabel className="z-10 overflow-hidden text-white mix-blend-difference" />
+          </div>
+        )}
       </ScaledStage>
     </div>
   )
@@ -96,14 +213,14 @@ function Intro() {
 const WORK_IMAGE = {
   placeam: (
     <div className="absolute inset-0 bg-mist">
-      <img src="/images/home/placeam.png" alt="Placeam mobile shopping screens" className="absolute left-1/2 top-[10.66%] w-[97.04%] -translate-x-1/2" />
+      <img loading="lazy" decoding="async" src="/images/home/placeam.webp" alt="Placeam mobile shopping screens" className="absolute left-1/2 top-[10.66%] w-[97.04%] -translate-x-1/2" />
     </div>
   ),
-  fleetkit: <img src="/images/home/fleetkit.png" alt="Fleetkit wordmark on violet" className="absolute inset-0 size-full object-cover" />,
+  fleetkit: <img loading="lazy" decoding="async" src="/images/home/fleetkit.webp" alt="Fleetkit wordmark on violet" className="absolute inset-0 size-full object-cover" />,
   acemyx: (
     <div className="absolute inset-0 overflow-hidden bg-stone">
       <div className="absolute left-[14.42%] top-[38.11%] h-[98.67%] w-[83.55%] overflow-hidden rounded-lg">
-        <img src="/images/home/acemyx.png" alt="Acemyx analytics dashboard" className="absolute left-[-3.54%] top-[-26.49%] h-[126.49%] w-[103.54%] max-w-none" />
+        <img loading="lazy" decoding="async" src="/images/home/acemyx.webp" alt="Acemyx analytics dashboard" className="absolute left-[-3.54%] top-[-26.49%] h-[126.49%] w-[103.54%] max-w-none" />
       </div>
     </div>
   ),
@@ -111,8 +228,8 @@ const WORK_IMAGE = {
 
 function WorkCard({ name, cta, to }) {
   const image = (
-    <div className="relative aspect-[541/375] w-full overflow-hidden">
-      <div className="absolute inset-0 transition-transform duration-500 ease-out group-hover/card:scale-[1.02]">{WORK_IMAGE[name]}</div>
+    <div className="relative aspect-[541/375] w-full origin-bottom overflow-hidden transition-transform duration-300 ease-out group-hover/card:scale-[1.02]">
+      {WORK_IMAGE[name]}
     </div>
   )
 
@@ -128,11 +245,53 @@ function WorkCard({ name, cta, to }) {
 }
 
 function SelectedWorks() {
+  const track = useRef(null)
+  const dragged = useRef(false)
+
+  useGSAP(() => {
+    const media = gsap.matchMedia()
+
+    // Touch screens keep native swiping; a mouse drags the row.
+    media.add('(pointer: fine)', () => {
+      const getBounds = () => ({
+        minX: Math.min(0, document.documentElement.clientWidth - track.current.scrollWidth),
+        maxX: 0,
+      })
+
+      const [draggable] = Draggable.create(track.current, {
+        type: 'x',
+        bounds: getBounds(),
+        inertia: !prefersReducedMotion(),
+        edgeResistance: 0.85,
+        dragClickables: true,
+        cursor: 'grab',
+        activeCursor: 'grabbing',
+        onPress() {
+          dragged.current = false
+          this.applyBounds(getBounds())
+        },
+        onDragStart() {
+          dragged.current = true
+        },
+      })
+
+      return () => draggable.kill()
+    })
+
+    return () => media.revert()
+  })
+
+  const blockClickAfterDrag = (event) => {
+    if (dragged.current) event.preventDefault()
+  }
+
   return (
-    <section className="mt-20 lg:mt-[142px]">
+    <section className="mt-20 overflow-x-clip lg:mt-[142px]">
       <h2 data-reveal className="mx-auto max-w-[1512px] px-page text-h3 leading-[1.4] text-black">Selected Works</h2>
-      <div data-reveal className="no-scrollbar mt-6 flex gap-2 overflow-x-auto lg:mt-10">
-        {selectedWorks.map((work) => <WorkCard key={work.name} {...work} />)}
+      <div data-reveal className="no-scrollbar mt-6 overflow-x-auto pointer-fine:overflow-visible lg:mt-10">
+        <div ref={track} onClickCapture={blockClickAfterDrag} className="flex w-max select-none gap-2 [&_img]:[-webkit-user-drag:none]">
+          {selectedWorks.map((work) => <WorkCard key={work.name} {...work} />)}
+        </div>
       </div>
     </section>
   )
@@ -186,7 +345,7 @@ function Testimonials() {
             Trusted by developers and used by micro-startups and agencies
           </blockquote>
           <figcaption className="flex items-center gap-3 text-base-lg text-black">
-            <img src="/images/home/avatar.png" alt="" width="40" height="40" />
+            <img loading="lazy" decoding="async" src="/images/home/avatar.webp" alt="" width="40" height="40" />
             UncleJude - Placeam
           </figcaption>
         </figure>

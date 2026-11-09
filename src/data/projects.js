@@ -11,7 +11,7 @@ export const projects = {
           'A buyer sees an item on Instagram or TikTok, comments "mine," sends a message, negotiates delivery, transfers money, and waits.',
           'There is no shared order history.',
         ],
-        image: { src: '/images/project/image-1.png', alt: 'Fleetkit wordmark on violet', bg: '#d9d9d9' },
+        image: { src: '/images/project/image-1.webp', alt: 'Fleetkit wordmark on violet', bg: '#d9d9d9' },
       },
       {
         heading: 'The Problem',
@@ -29,7 +29,7 @@ export const projects = {
         body: [
           'The challenge is not limited to one side of the marketplace. Both buyers and vendors operate inside a system that exposes them to risk.',
         ],
-        image: { src: '/images/project/image-2.png', alt: 'Three Fleetkit mobile screens', tight: true },
+        image: { src: '/images/project/image-2.webp', alt: 'Three Fleetkit mobile screens', tight: true },
       },
       {
         heading: 'What We Learned',

@@ -16,7 +16,7 @@ function Section({ heading, body, image, first }) {
           className={`mx-auto aspect-[756/405] w-full max-w-[756px] ${image.tight ? 'mt-12' : 'mt-16 lg:mt-24'}`}
           style={{ backgroundColor: image.bg }}
         >
-          <img src={image.src} alt={image.alt} className="size-full object-cover" />
+          <img loading="lazy" decoding="async" src={image.src} alt={image.alt} className="size-full object-cover" />
         </div>
       )}
     </>

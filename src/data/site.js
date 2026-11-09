@@ -9,6 +9,9 @@ export const site = {
   ],
 }
 
+// Update these two words each time the hero moodboard changes.
+export const moodboardLabel = ['November', 'Moodboard']
+
 export const nav = [
   { label: 'Work', to: '/work' },
   { label: 'Profile', to: '/profile' },
@@ -54,9 +57,9 @@ export const communityLogos = [
 ]
 
 export const eventCards = [
-  { left: 0, top: 36.66, w: 262.23, h: 314.695, rotate: -6, bg: '#fdfdfd', src: '/images/profile/event-1.png' },
-  { left: 183.79, top: 91, w: 251.136, h: 306.206, rotate: 3.66, bg: '#f44a32', src: '/images/profile/event-2.png' },
-  { left: 339.79, top: 0, w: 254.993, h: 309.179, rotate: -4.46, bg: '#0038ff', src: '/images/profile/event-3.png' },
-  { left: 512.79, top: 93, w: 240.443, h: 297.853, rotate: -1.48, bg: '#fdfdfd', src: '/images/profile/event-4.png' },
-  { left: 664.76, top: 19.98, w: 261.957, h: 314.489, rotate: 5.94, bg: '#fdfdfd', src: '/images/profile/event-5.png' },
+  { left: 0, top: 36.66, w: 262.23, h: 314.695, rotate: -6, bg: '#fdfdfd', src: '/images/profile/event-1.webp' },
+  { left: 183.79, top: 91, w: 251.136, h: 306.206, rotate: 3.66, bg: '#f44a32', src: '/images/profile/event-2.webp' },
+  { left: 339.79, top: 0, w: 254.993, h: 309.179, rotate: -4.46, bg: '#0038ff', src: '/images/profile/event-3.webp' },
+  { left: 512.79, top: 93, w: 240.443, h: 297.853, rotate: -1.48, bg: '#fdfdfd', src: '/images/profile/event-4.webp' },
+  { left: 664.76, top: 19.98, w: 261.957, h: 314.489, rotate: 5.94, bg: '#fdfdfd', src: '/images/profile/event-5.webp' },
 ]

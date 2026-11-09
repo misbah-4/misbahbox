@@ -3,11 +3,13 @@
 
 @font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Regular.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Medium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
 @font-face { font-family: "Neue Montreal"; src: url("/fonts/Neue%20Montreal/NeueMontreal-Italic.otf") format("opentype"); font-weight: 400; font-style: italic; font-display: swap; }
 
 @theme {
   --font-sans: "Neue Montreal", ui-sans-serif, system-ui, sans-serif;
   --font-nav: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-script: "Momo Signature", cursive;
 
   --color-page: #fafafa;
