@@ -154,7 +154,7 @@ function Intro() {
           ))}
         </div>
         <p className="max-w-[386px] text-center text-lead leading-[1.2] tracking-[0.01em] text-[#f5f5f5] md:absolute md:left-[calc(var(--u)*959)] md:top-[calc(var(--u)*289)] md:w-[calc(var(--u)*386)] md:max-w-none md:text-left md:text-[calc(var(--u)*28)]">
-          I am a Designer and Developer focused on bringing intuitive concepts to life.
+          I’m a product designer and developer. I turn early ideas into products people find easy to use.
         </p>
       </div>
     </section>
@@ -491,7 +491,7 @@ function Collaboration() {
         ))}
       </div>
       <p data-reveal className="mx-auto mt-[35px] max-w-[413px] text-center text-body-lg tracking-[-0.01em]">
-        Trusted by developers and used by micro-startups and agencies
+        Teams I’ve worked with
       </p>
       <div data-reveal className="mt-10 lg:mt-[96px]">
         <PartnerMarquee />
@@ -619,7 +619,7 @@ function Community() {
         <CommunityIllustration />
       </div>
       <h2 data-reveal className="mx-auto mt-[80px] max-w-[413px] text-center text-h2 leading-[1.2]">
-        Built with creators, Loved by communities
+        Communities I’ve built with
       </h2>
       <div data-reveal className="mx-auto mt-16 flex max-w-[1206px] flex-wrap items-center justify-center gap-x-8 opacity-60 lg:mt-[120px] lg:flex-nowrap lg:gap-x-10">
         {communityLogos.map(({ src, alt, box }) => (

@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ArrowLink from '../components/ArrowLink.jsx'
 import ScaledStage from '../components/ScaledStage.jsx'
-import { moodboardLabel, selectedWorks, sideProjects } from '../data/site.js'
+import { moodboardLabel, selectedWorks, sideProjects, testimonials } from '../data/site.js'
 import { Draggable, gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from '../lib/motion.js'
 
 const SHOWCASE = [
@@ -203,8 +203,8 @@ function Intro() {
       </div>
       <div data-reveal className="flex w-full max-w-[531px] flex-col items-start gap-8 lg:gap-12">
         <p className="text-body-lg leading-[1.4] tracking-[0.02em] text-black lg:h-[92px]">
-          I help Startups companies Design and Build <u className="decoration-from-font">Web</u> &{' '}
-          <u className="decoration-from-font">Mobile Experiences</u> across Commercial, AI, Fashion, Productivity tools, and Frontier Tech.
+          I design and build <u className="decoration-from-font">web</u> and{' '}
+          <u className="decoration-from-font">mobile products</u> for startups, across commerce, AI, fashion and productivity tools.
         </p>
         <div className="tracking-[0.02em]">
           <ArrowLink to="/profile">Know more about me</ArrowLink>
@@ -310,13 +310,18 @@ function SideProjects() {
           <img src="/images/icons/arrow-large.svg" alt="" width="24" height="24" className="-scale-y-100" />
         </div>
         <ul data-reveal className="w-full max-w-[623px]">
-          {sideProjects.map((project, index) => (
+          {sideProjects.map(({ label, href }, index) => (
             <li
-              key={project}
+              key={label}
               className={`text-body-lg leading-[1.4] transition-colors duration-200 hover:text-black ${index === 0 ? 'text-black' : 'text-muted'}`}
             >
               {index > 0 && <img src="/images/icons/divider.svg" alt="" className="my-[13px] block h-px w-full" />}
-              {project}
+              {href ? (
+                <a href={href} target="_blank" rel="noreferrer" className="group relative inline-flex items-center gap-1 before:absolute before:inset-x-0 before:-inset-y-2.5">
+                  {label}
+                  <img src="/images/icons/arrow-up-right.svg" alt="" width="16" height="16" className="shrink-0 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+              ) : label}
             </li>
           ))}
         </ul>
@@ -325,36 +330,111 @@ function SideProjects() {
   )
 }
 
-function BrandLogo({ src, alt, box, width, height }) {
+const TESTIMONIAL_ROTATE_MS = 6000
+const SWAP_OUT = { autoAlpha: 0, y: -8, duration: 0.18, ease: 'power1.in' }
+const SWAP_IN = { autoAlpha: 1, y: 0, duration: 0.28, ease: 'power2.out', stagger: 0.03 }
+
+function BrandLogo({ brand, logo, width, height = 22, box, onSelect }) {
   return (
-    <div className="flex h-[100px] shrink-0 items-center justify-center max-sm:h-16 max-sm:!w-[130px]" style={{ width: box }}>
-      <img src={src} alt={alt} width={width} height={height} />
-    </div>
+    <button
+      type="button"
+      data-swap
+      aria-label={`Read the ${brand} testimonial`}
+      onClick={onSelect}
+      className="flex h-[100px] shrink-0 cursor-pointer items-center justify-center transition-opacity duration-150 hover:opacity-60 max-sm:h-16 max-sm:!w-[130px]"
+      style={{ width: box }}
+    >
+      {logo
+        ? <img src={logo} alt="" width={width} height={height} />
+        : <span className="font-medium uppercase tracking-[0.04em] text-black/20">{brand}</span>}
+    </button>
   )
 }
 
 function Testimonials() {
+  const scope = useRef(null)
+  const inView = useRef(false)
+  const switching = useRef(false)
+  const firstRender = useRef(true)
+  const [active, setActive] = useState(0)
+  const activeRef = useRef(active)
+  const count = testimonials.length
+
+  useGSAP(
+    () => {
+      if (firstRender.current) {
+        firstRender.current = false
+        return
+      }
+      gsap.fromTo('[data-swap]', { autoAlpha: 0, y: 8 }, {
+        ...SWAP_IN,
+        onComplete: () => {
+          switching.current = false
+        },
+      })
+    },
+    { scope, dependencies: [active] },
+  )
+
+  const show = (next) => {
+    if (switching.current || next === activeRef.current) return
+    activeRef.current = next
+
+    if (prefersReducedMotion()) {
+      setActive(next)
+      return
+    }
+
+    switching.current = true
+    gsap.to('[data-swap]', { ...SWAP_OUT, onComplete: () => setActive(next) })
+  }
+  const showRef = useRef(show)
+
+  useEffect(() => {
+    showRef.current = show
+  })
+
+  useEffect(() => {
+    if (count < 2 || prefersReducedMotion()) return undefined
+
+    const watcher = new IntersectionObserver(([entry]) => {
+      inView.current = entry.isIntersecting
+    })
+    watcher.observe(scope.current)
+    const timer = setInterval(() => {
+      if (inView.current) showRef.current((activeRef.current + 1) % count)
+    }, TESTIMONIAL_ROTATE_MS)
+
+    return () => {
+      watcher.disconnect()
+      clearInterval(timer)
+    }
+  }, [count])
+
+  if (count === 0) return null
+
+  const current = testimonials[active]
+  const [left, right] = testimonials.flatMap((item, index) => (index === active ? [] : [{ ...item, index }]))
+
   return (
-    <section className="mx-auto mt-20 max-w-[1512px] px-page lg:mt-[110px]">
+    <section ref={scope} className="mx-auto mt-20 max-w-[1512px] px-page lg:mt-[110px]">
       <div data-reveal className="flex items-start justify-between gap-6 text-body-lg leading-[1.4] text-black">
         <h2 className="max-w-[223px]">Honest impressions from the founders</h2>
         <p className="max-w-[170px] text-right">What it’s like to work with me.</p>
       </div>
       <div data-reveal className="mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-6 sm:gap-6 lg:mt-[62px] lg:flex-nowrap">
         <div className="order-2 lg:order-1">
-          <BrandLogo src="/images/home/logo-fleetkit.svg" alt="Fleetkit" box={204} width={108} height={22} />
+          {left && <BrandLogo {...left} onSelect={() => show(left.index)} />}
         </div>
-        <figure className="order-1 flex w-full max-w-[571px] flex-col items-center gap-12 py-16 lg:order-2 lg:h-[328px] lg:justify-center lg:py-0">
-          <blockquote className="max-w-[438px] text-center text-base-lg text-black">
-            Trusted by developers and used by micro-startups and agencies
-          </blockquote>
-          <figcaption className="flex items-center gap-3 text-base-lg text-black">
-            <img loading="lazy" decoding="async" src="/images/home/avatar.webp" alt="" width="40" height="40" />
-            UncleJude - Placeam
+        <figure aria-live="polite" className="order-1 flex min-h-[272px] w-full max-w-[571px] flex-col items-center justify-center gap-12 py-10 lg:order-2 lg:h-[328px] lg:py-0">
+          <blockquote data-swap className="max-w-[438px] text-center text-base-lg text-black">{current.quote}</blockquote>
+          <figcaption data-swap className="flex items-center gap-3 text-base-lg text-black">
+            {current.avatar && <img loading="lazy" decoding="async" src={current.avatar} alt="" width="40" height="40" />}
+            {current.name} - {current.brand}
           </figcaption>
         </figure>
         <div className="order-3">
-          <BrandLogo src="/images/home/logo-studione.svg" alt="Studione" box={217} width={111} height={22} />
+          {right && <BrandLogo {...right} onSelect={() => show(right.index)} />}
         </div>
       </div>
     </section>

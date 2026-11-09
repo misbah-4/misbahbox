@@ -5,7 +5,7 @@ function Footer() {
     <footer id="contact" className="mx-auto flex max-w-[1512px] flex-col gap-20 px-page pb-8 pt-16 text-ink lg:gap-[120px] lg:pt-24">
       <div data-reveal className="text-title leading-[1.2] tracking-[-0.02em]">
         <p>
-          Let’s make <em>it</em>, <em className="text-faint">worth</em> it.
+          Let’s make <em>it</em> <em className="text-faint">worth</em> it.
         </p>
         <a
           href={site.mailto}
@@ -15,7 +15,7 @@ function Footer() {
         </a>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <p className="text-[16px] leading-5 tracking-[0.0175em]">© 2026-2027</p>
+        <p className="text-[16px] leading-5 tracking-[0.0175em]">© 2026</p>
         <ul className="flex items-center gap-6 text-[18px] leading-11">
           {site.socials.map(({ label, href }) => (
             <li key={label} className="underline decoration-from-font">

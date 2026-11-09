@@ -25,12 +25,47 @@ export const selectedWorks = [
 ]
 
 export const sideProjects = [
-  'Browser extension design inspection tools',
-  'Design Engineer Workflow Tracker',
-  'Moodtip Figma Plugin: Annotate your design taste on figma',
-  'Handson',
-  'Football Manager',
+  { label: 'Browser extension design inspection tools', href: 'https://github.com/misbah-4/design-inspector' },
+  { label: 'Design Engineer Workflow Tracker' },
+  { label: 'Moodtip Figma Plugin: Annotate your design taste on figma', href: 'https://github.com/misbah-4/Moodtip' },
+  { label: 'Handson' },
+  { label: 'Football Manager', href: 'https://playpitchcraft.vercel.app' },
 ]
+
+// Move a quote into approvedTestimonials only after the person quoted has signed off on the wording.
+const approvedTestimonials = []
+
+// Drafts stay out of production builds entirely.
+const draftTestimonials = import.meta.env.DEV
+  ? [
+      {
+        brand: 'Placeam',
+        name: 'UncleJude',
+        avatar: '/images/home/avatar.webp',
+        box: 204,
+        quote: 'Misbah just gets it. You drop a rough idea in the chat and a few days later you’re clicking through something that feels like a real product.',
+      },
+      {
+        brand: 'Fleetkit',
+        name: '[Name needed]',
+        logo: '/images/home/logo-fleetkit.svg',
+        width: 108,
+        box: 204,
+        quote: 'Honestly the easiest designer we’ve worked with. Asks the right questions, moves fast, and the handoff to dev was painless.',
+      },
+      {
+        brand: 'Acemyx',
+        name: 'Abdurrahman',
+        logo: '/images/profile/logo-acemyx.svg',
+        width: 117,
+        height: 30,
+        box: 217,
+        quote: 'Send Misbah the messy version. What comes back is clean, simple and ready to build.',
+      },
+    ]
+  : []
+
+export const testimonials = [...approvedTestimonials, ...draftTestimonials]
 
 export const works = [
   { name: 'Placeam' },

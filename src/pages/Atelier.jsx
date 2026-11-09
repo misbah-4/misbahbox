@@ -10,7 +10,7 @@ const PREVIEW_FILL = 0.86
 const PHONE_WIDTH = 768
 const PHONE_MARGIN = 16
 const WELCOME_LEFT = 222
-const INTRO = 'I am a Developer and Designer focused on bringing intuitive concepts to life.'
+const INTRO = 'Visual experiments and things I make outside client work.'
 
 const getScale = () => Math.min(1.15, window.innerHeight / STAGE_HEIGHT)
 const wrapX = gsap.utils.wrap(-OFFSCREEN_MARGIN, LOOP_WIDTH - OFFSCREEN_MARGIN)
