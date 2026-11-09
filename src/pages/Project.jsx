@@ -30,11 +30,11 @@ function Project() {
   if (!project) return <Navigate to="/work" replace />
 
   return (
-    <article className="mx-auto max-w-[1512px] px-page pt-[170px]">
+    <article className="mx-auto max-w-[1512px] px-page pt-[110px] lg:pt-[170px]">
       <div className="mx-auto flex h-[202px] w-[174px] items-center justify-center">
         <img src={project.hero} alt="" className="h-[178.33px] w-[142.44px] -rotate-169" />
       </div>
-      <div className="mx-auto mt-[102px] w-full max-w-measure">
+      <div className="mx-auto mt-12 w-full lg:mt-[102px] max-w-measure">
         <h1 data-reveal className="text-h1 font-medium leading-[1.2] tracking-[-0.01em] text-black">{project.title}</h1>
       </div>
       <div className="mt-12">

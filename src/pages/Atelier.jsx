@@ -7,6 +7,9 @@ const OFFSCREEN_MARGIN = 450
 const MAX_SQUEEZE = 0.2
 const PREVIEW_DURATION = 0.6
 const PREVIEW_FILL = 0.86
+const PHONE_WIDTH = 768
+const PHONE_MARGIN = 16
+const WELCOME_LEFT = 222
 const INTRO = 'I am a Developer and Designer focused on bringing intuitive concepts to life.'
 
 const getScale = () => Math.min(1.15, window.innerHeight / STAGE_HEIGHT)
@@ -59,6 +62,7 @@ function Atelier() {
   const overlay = useRef(null)
   const backdrop = useRef(null)
   const previewImage = useRef(null)
+  const swipeHint = useRef(null)
   const opened = useRef(null)
   const [scale, setScale] = useState(getScale)
   const scaleRef = useRef(scale)
@@ -141,7 +145,11 @@ function Atelier() {
       const reduced = prefersReducedMotion()
       const items = gsap.utils.toArray('[data-item]')
       const getDragX = () => gsap.getProperty(proxy.current, 'x')
-      let lastX = 0
+
+      // Phones start with the first picture in view instead of empty space.
+      if (window.innerWidth < PHONE_WIDTH) gsap.set(proxy.current, { x: PHONE_MARGIN - WELCOME_LEFT * scaleRef.current })
+
+      let lastX = getDragX()
       let speed = 0
       let direction = -1
 
@@ -157,6 +165,7 @@ function Atelier() {
         },
         onDragStart() {
           dragged.current = true
+          swipeHint.current.style.opacity = 0
         },
       })
 
@@ -196,6 +205,7 @@ function Atelier() {
     <section ref={section} className="relative h-dvh touch-pan-y select-none overflow-hidden [&_img]:[-webkit-user-drag:none]">
       <h1 className="sr-only">Atelier</h1>
       <div ref={proxy} className="hidden" />
+      <p ref={swipeHint} className="pointer-events-none absolute inset-x-0 bottom-8 z-10 text-center text-[14px] text-muted transition-opacity duration-200 md:hidden">Swipe to explore</p>
       <div className="absolute left-0 top-0 origin-top-left" style={{ height: STAGE_HEIGHT, transform: `scale(${scale})` }}>
         <Item left={222} top={453} width={200} height={61}>
           <p className="whitespace-nowrap text-[48px] italic leading-[1.28] tracking-[-0.006em] text-ink">Welcome</p>

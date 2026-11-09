@@ -16,7 +16,7 @@ function Layout() {
     const raf = (time) => lenis.raf(time * 1000)
     lenis.on('scroll', ScrollTrigger.update)
     gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
+    if (window.matchMedia('(pointer: fine)').matches) gsap.ticker.lagSmoothing(0)
     setLenis(lenis)
 
     return () => {

@@ -26,13 +26,13 @@
 
   /* Type: Figma size at 1512, scaling down fluidly */
   --text-display: clamp(2.5rem, 4.233vw, 4rem);
-  --text-title: clamp(2.25rem, 3.704vw, 3.5rem);
+  --text-title: clamp(2rem, 3.704vw, 3.5rem);
   --text-h1: clamp(2rem, 3.175vw, 3rem);
   --text-h2: clamp(1.75rem, 2.646vw, 2.5rem);
-  --text-h3: clamp(1.625rem, 2.117vw, 2rem);
+  --text-h3: clamp(1.5rem, 2.117vw, 2rem);
   --text-lead: clamp(1.25rem, 1.852vw, 1.75rem);
   --text-body-lg: clamp(1.125rem, 1.587vw, 1.5rem);
-  --text-base-lg: 1.25rem;
+  --text-base-lg: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
   --text-nav: 1rem;
 
   /* Case study reading column and page gutter */
@@ -47,6 +47,10 @@ body {
   letter-spacing: 0.005em;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+}
+
+@media (max-width: 767.98px) {
+  h1, h2, h3 { text-wrap: balance; }
 }
 
 .no-scrollbar { scrollbar-width: none; }

@@ -64,19 +64,19 @@ function Intro() {
       }
       const media = gsap.matchMedia()
 
-      // The content holds still on screen while the dark panel's edge rises to uncover it.
-      gsap.fromTo(
-        content,
-        { y: () => -scope.current.offsetHeight },
-        {
-          y: 0,
-          ease: 'none',
-          scrollTrigger: { trigger: scope.current, start: 'top bottom', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true },
-        },
-      )
-
       // Desktop: the words start together and the growing card pushes them apart.
       media.add('(min-width: 768px)', () => {
+        // The content holds still on screen while the dark panel's edge rises to uncover it.
+        gsap.fromTo(
+          content,
+          { y: () => -scope.current.offsetHeight },
+          {
+            y: 0,
+            ease: 'none',
+            scrollTrigger: { trigger: scope.current, start: 'top bottom', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true },
+          },
+        )
+
         const middle = card.getBoundingClientRect().left + card.getBoundingClientRect().width / 2
         const steps = { index: 0 }
         const flip = flipThroughImages({ paused: true })
@@ -178,10 +178,12 @@ const FOCUS_BOLD_REACH = 2.5
 const FOCUS_MEDIUM_REACH = 4.5
 const FOCUS_LIFT_REACH = 5
 const FOCUS_HEAD_LEAD = 5
+const FOCUS_PHONE_DIM = 0.45
 const FOCUS_RECAP = ['web apps', 'usability', 'interface motion,']
 const FOCUS_LAST_START = FOCUS_LETTERS.findIndex(({ last }) => last)
 const RECAP_LINE_DELAY = 0.2
 const RECAP_LINE_ERASE = 0.6
+const FOCUS_START = { head: -FOCUS_HEAD_LEAD, open: 0, stack: 0, erase: 0 }
 
 const focusBounds = (key, left, widths) => {
   const indexes = FOCUS_LETTERS.flatMap(({ char, [key]: match }, index) => (match && char !== ' ' ? [index] : []))
@@ -202,16 +204,16 @@ function Focus() {
       const heading = section.current.querySelector('h2')
       const track = section.current.querySelector('[data-focus-track]')
       const letters = gsap.utils.toArray('[data-focus-letter]')
-      const overflow = () => Math.max(0, (window.innerHeight - section.current.offsetHeight) / 2)
+      const fillScreen = () => Math.max(1, window.innerHeight / section.current.offsetHeight)
       const toCentre = () => section.current.offsetHeight / 2 - (heading.offsetTop + heading.offsetHeight / 2)
-      const zoom = () => (window.innerWidth < 768 ? 1 : FOCUS_TEXT_ZOOM)
       const last = FOCUS_LETTERS.length - 1
       const recap = section.current.querySelector('[data-focus-recap]')
       const recapLines = gsap.utils.toArray('[data-focus-recap-line]').map((line) => gsap.utils.toArray(line.children))
-      const state = { head: -FOCUS_HEAD_LEAD, open: 0, stack: 0, erase: 0 }
+      const state = { ...FOCUS_START }
       const drawn = letters.map(() => ({}))
       const metrics = { left: [], widths: [], firstCentre: 0, lastCentre: 0, ready: false }
       let cancelled = false
+      let phone = false
 
       const render = () => {
         if (!metrics.ready) return
@@ -235,12 +237,18 @@ function Focus() {
           let weight = kind.first && !read ? 500 : kind.last && read ? 500 : kind.emphasis && read ? 700 : 400
           if (reach <= FOCUS_BOLD_REACH) weight = 700
           else if (reach <= FOCUS_MEDIUM_REACH) weight = Math.max(weight, 500)
+          if (phone) weight = kind.emphasis ? 700 : 500
           if (kind.italic) weight = 400
+
+          // Phones show the highlight with opacity, since changing font weight forces layout.
+          let highlight = 1
+          if (phone && !read) highlight = FOCUS_PHONE_DIM
+          if (phone && reach <= FOCUS_MEDIUM_REACH) highlight = 1
 
           const distance = Math.abs(left[i] + widths[i] / 2 - camera) * scale
           const inWindow = 1 - gsap.utils.clamp(0, 1, (distance - edge * 0.62) / (edge * 0.38))
           const stays = (kind.first && head < 8) || (kind.last && head > last - 8)
-          const opacity = stays ? 1 : Math.round(state.open * inWindow * 100) / 100
+          const opacity = stays ? 1 : Math.round(state.open * inWindow * highlight * 100) / 100
           const lift = kind.lift ? Math.round(Math.max(0, 1 - reach / FOCUS_LIFT_REACH) * 18) / 100 : 0
 
           const was = drawn[i]
@@ -285,52 +293,78 @@ function Focus() {
         render()
       }
 
-      measure()
       document.fonts.ready.then(() => {
         if (!cancelled) measure()
       })
 
+      const media = gsap.matchMedia()
+
       // Grows to fill the screen, reads along the sentence, then returns to its own size.
-      gsap
-        .timeline({
-          defaults: { ease: 'power2.inOut' },
-          onUpdate: () => {
-            render()
-            renderRecap()
-          },
-          scrollTrigger: {
-            trigger: section.current,
-            start: 'center center',
-            end: '+=375%',
-            pin: true,
-            scrub: true,
-            invalidateOnRefresh: true,
-            onRefresh: measure,
-          },
-        })
-        .to(frame, { top: () => -overflow(), bottom: () => -overflow(), duration: 1 }, 0)
-        .to(heading, { scale: zoom, y: toCentre, duration: 1 }, 0)
-        .to(state, { open: 1, duration: 0.4, ease: 'none' }, 1)
-        .to(state, { head: last + FOCUS_HEAD_LEAD, duration: 5.6, ease: 'none' }, 1)
-        .to(state, { open: 0, duration: 0.4, ease: 'none' }, 6.6)
-        .to(state, { stack: FOCUS_RECAP.length, duration: 0.6, ease: 'none' }, 7)
-        .to(state, { erase: 1, duration: 0.6, ease: 'none' }, 7.7)
-        .to(frame, { top: 0, bottom: 0, duration: 1 }, 8.3)
-        .to(heading, { scale: 1, y: 0, duration: 1 }, 8.3)
+      media.add('(min-width: 768px)', () => {
+        phone = false
+        Object.assign(state, FOCUS_START)
+        measure()
+
+        gsap
+          .timeline({
+            defaults: { ease: 'power2.inOut' },
+            onUpdate: () => {
+              render()
+              renderRecap()
+            },
+            scrollTrigger: {
+              trigger: section.current,
+              start: 'center center',
+              end: '+=375%',
+              pin: true,
+              scrub: true,
+              invalidateOnRefresh: true,
+              onRefresh: measure,
+            },
+          })
+          .to(frame, { scaleY: fillScreen, duration: 1 }, 0)
+          .to(heading, { scale: FOCUS_TEXT_ZOOM, y: toCentre, duration: 1 }, 0)
+          .to(state, { open: 1, duration: 0.4, ease: 'none' }, 1)
+          .to(state, { head: last + FOCUS_HEAD_LEAD, duration: 5.6, ease: 'none' }, 1)
+          .to(state, { open: 0, duration: 0.4, ease: 'none' }, 6.6)
+          .to(state, { stack: FOCUS_RECAP.length, duration: 0.6, ease: 'none' }, 7)
+          .to(state, { erase: 1, duration: 0.6, ease: 'none' }, 7.7)
+          .to(frame, { scaleY: 1, duration: 1 }, 8.3)
+          .to(heading, { scale: 1, y: 0, duration: 1 }, 8.3)
+      })
+
+      // Phones: CSS sticky holds the line, so only the letters follow the scroll.
+      media.add('(max-width: 767.98px)', () => {
+        phone = true
+        Object.assign(state, FOCUS_START)
+        measure()
+
+        gsap
+          .timeline({
+            defaults: { ease: 'none' },
+            onUpdate: render,
+            scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom bottom', scrub: 0.3, onRefresh: measure },
+          })
+          .to(state, { open: 1, duration: 0.4 }, 0)
+          .to(state, { head: last + FOCUS_HEAD_LEAD, duration: 5 }, 0)
+          .to(state, { open: 0, duration: 0.4 }, 4.8)
+      })
 
       return () => {
         cancelled = true
+        media.revert()
       }
     },
     { scope: section },
   )
 
   return (
-    <section ref={section} className="relative z-20 flex justify-center overflow-x-clip px-page pb-[clamp(120px,22vw,334px)] pt-[clamp(80px,16.67vw,252px)] text-white">
+    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[240svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
       <div data-focus-frame className="absolute inset-x-0 bottom-0 top-0 bg-night" />
       {reduced ? (
         <h2 className="relative w-full max-w-[777px] text-center text-display font-medium leading-[1.28] tracking-[-0.006em]">{FOCUS_SENTENCE}</h2>
       ) : (
+        <div className="sticky top-0 flex h-svh w-full items-center justify-center md:static md:h-auto md:items-start">
         <h2 aria-label={FOCUS_SENTENCE} className="relative h-[1.28em] w-full max-w-[777px] text-[min(7.5vw,2.5rem)] font-medium md:text-display leading-[1.28] tracking-[-0.006em] will-change-transform">
           <span data-focus-track aria-hidden="true" className="absolute left-1/2 top-0 flex w-max whitespace-pre will-change-transform">
             {FOCUS_LETTERS.map(({ char, italic, first }, index) => (
@@ -351,6 +385,7 @@ function Focus() {
             </span>
           </span>
         </h2>
+        </div>
       )}
     </section>
   )
@@ -389,7 +424,7 @@ function Philosophy() {
 
   return (
     <section ref={scope} className="flex justify-center px-page py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
-      <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[min(8.4vw,2rem)] sm:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
+      <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[min(7.6vw,2rem)] sm:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
         My work is rooted in{' '}
         <br className="max-sm:hidden" />
         <span className="relative whitespace-pre font-script">
@@ -479,7 +514,7 @@ function Pointer({ src, left, top, transform }) {
 
 function RoleLabel({ left, top, width, bg, color, children }) {
   return (
-    <div className="absolute flex h-[24.719px] items-center justify-center whitespace-nowrap rounded-[18.681px] p-[7.784px] text-[7.914px] font-medium leading-[1.2] tracking-[0.0791px]" style={{ left, top, width, backgroundColor: bg, color }}>
+    <div className="absolute flex h-[24.719px] items-center justify-center whitespace-nowrap rounded-[18.681px] p-[7.784px] text-[7.914px] font-medium leading-[1.2] tracking-[0.0791px] max-sm:h-7 max-sm:!w-auto max-sm:text-[14px]" style={{ left, top, width, backgroundColor: bg, color }}>
       {children}
     </div>
   )
@@ -536,13 +571,13 @@ function CommunityIllustration() {
           </div>
         </Pop>
         <div data-pill className="absolute inset-0" style={{ transformOrigin: '233px 146.5px' }}>
-          <div className="absolute left-[140px] top-[122px] h-[49px] w-[186px] rounded-[21px] bg-[rgba(217,217,217,0.24)] backdrop-blur-[11.4px]">
+          <div className="absolute left-[140px] top-[122px] h-[49px] w-[186px] rounded-[21px] bg-[rgba(217,217,217,0.24)] backdrop-blur-[11.4px] max-sm:left-[115px] max-sm:w-[222px]">
             <div className={GLASS_EDGE} />
           </div>
-          <img loading="lazy" decoding="async" src={`${P}/ill-thumb.webp`} alt="" className="absolute left-[150px] top-[132px] size-[30px] max-w-none rounded-[12px] object-cover" />
+          <img loading="lazy" decoding="async" src={`${P}/ill-thumb.webp`} alt="" className="absolute left-[150px] top-[132px] size-[30px] max-w-none rounded-[12px] object-cover max-sm:left-[124px]" />
           <div data-pill-text>
-            <p className="absolute left-[186px] top-[134px] whitespace-nowrap text-[8px] leading-[1.2] tracking-[0.08px] text-[#f2f2f2]">Community Led Events</p>
-            <p className="absolute left-[186px] top-[147px] whitespace-nowrap text-[8px] font-medium leading-[1.2] tracking-[0.08px] text-[#f2f2f2]">Engaging Community Gatherings</p>
+            <p className="absolute left-[186px] top-[134px] whitespace-nowrap text-[8px] leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:left-[160px] max-sm:top-[137px] max-sm:text-[15px] max-sm:font-medium">Community Led Events</p>
+            <p className="absolute left-[186px] top-[147px] whitespace-nowrap text-[8px] font-medium leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:hidden">Engaging Community Gatherings</p>
           </div>
         </div>
         <Pop origin="120px 226px">
@@ -593,7 +628,9 @@ function Community() {
         <LogoBox box={217}><img src={`${P}/logo-updates.svg`} alt="Updates" width="217" height="100" className="max-w-[140px] lg:max-w-none" /></LogoBox>
       </div>
       <div data-reveal className="mx-auto mt-16 max-w-[927px] lg:mt-[149px]">
-        <ScaledStage width={927} height={398} minScale={0.5}>
+        <div className="no-scrollbar -mx-page overflow-x-auto px-page md:mx-0 md:overflow-visible md:px-0">
+        <div className="w-[640px] md:w-auto">
+        <ScaledStage width={927} height={398}>
           {eventCards.map(({ left, top, w, h, rotate, bg, src }) => (
             <div key={src} className="absolute flex items-center justify-center" style={{ left, top, width: w, height: h }}>
               <div className="relative h-[291.94px] w-[232.99px] overflow-hidden rounded transition-transform duration-300 ease-out hover:-translate-y-2" style={{ backgroundColor: bg, rotate: `${rotate}deg` }}>
@@ -602,6 +639,8 @@ function Community() {
             </div>
           ))}
         </ScaledStage>
+        </div>
+        </div>
       </div>
     </section>
   )
@@ -654,6 +693,8 @@ const SPAWN_GAP_MS = 90
 const GRAVITY = 3000
 const HOP = 70
 const MAX_TILT = 12
+const AUTO_DROP_MIN = 0.6
+const AUTO_DROP_MAX = 1.1
 const pieceSize = () => gsap.utils.clamp(110, 288, window.innerWidth * 0.16)
 const fallTime = (distance) => Math.sqrt((2 * Math.max(distance, 1)) / GRAVITY)
 
@@ -731,7 +772,32 @@ function Hobbies() {
       section.addEventListener('pointerleave', onLeave)
       section.addEventListener('pointerdown', onDown)
 
+      // Touch screens have no cursor to follow, so pieces fall on their own while in view.
+      const media = gsap.matchMedia()
+      media.add('(pointer: coarse)', () => {
+        let nextDrop = null
+        const dropAtRandom = () => {
+          drop(section.offsetWidth * gsap.utils.random(0.15, 0.85), section.offsetHeight * gsap.utils.random(0.1, 0.35))
+          nextDrop = gsap.delayedCall(gsap.utils.random(AUTO_DROP_MIN, AUTO_DROP_MAX), dropAtRandom)
+        }
+        const inView = ScrollTrigger.create({
+          trigger: section,
+          start: 'top 80%',
+          end: 'bottom 20%',
+          onToggle: (self) => {
+            nextDrop?.kill()
+            if (self.isActive) dropAtRandom()
+          },
+        })
+
+        return () => {
+          nextDrop?.kill()
+          inView.kill()
+        }
+      })
+
       return () => {
+        media.revert()
         section.removeEventListener('pointermove', onMove)
         section.removeEventListener('pointerleave', onLeave)
         section.removeEventListener('pointerdown', onDown)
@@ -741,8 +807,8 @@ function Hobbies() {
   )
 
   return (
-    <section ref={scope} className="relative flex h-[clamp(420px,42vw,764px)] items-center justify-center overflow-hidden px-page">
-      <p data-reveal className="text-center text-[clamp(2.25rem,4.67vw,5.25rem)] font-medium leading-[1.28] tracking-[-0.03em] text-black">
+    <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center overflow-hidden px-page">
+      <p data-reveal className="text-center text-[clamp(1.625rem,4.67vw,5.25rem)] font-medium leading-[1.28] tracking-[-0.03em] text-black">
         <span className="md:block">Beyond design: football, video games, </span>
         <span className="text-faint md:block">still life drawings, and Arcades.</span>
       </p>

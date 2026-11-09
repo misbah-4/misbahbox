@@ -28,6 +28,8 @@ const SHOWCASE = [
 // Each card crosses the stage in this many seconds, on the front half of an orbit.
 const CROSSING = 2.4
 const ORBIT_RADIUS = 430
+const PHONE_STAGE_SCALE = 0.78
+const ORBIT_EDGE_MARGIN = 70
 const STAGE = { width: 575, height: 337 }
 
 const centerY = ({ top, h }) => top + h / 2 - STAGE.height / 2
@@ -56,8 +58,8 @@ function DeckLabel({ className }) {
   const [before, after] = moodboardLabel
 
   return (
-    <div className={`absolute inset-0 text-[14px] uppercase leading-none ${className}`}>
-      <span className="absolute left-[-44px] top-1/2 -translate-y-1/2 whitespace-nowrap">{before}</span>
+    <div className={`absolute inset-0 text-[14px] uppercase leading-none max-sm:text-[18px] ${className}`}>
+      <span className="absolute left-[-44px] top-1/2 -translate-y-1/2 whitespace-nowrap max-sm:left-[-66px]">{before}</span>
       <span className="absolute left-[151px] top-1/2 -translate-y-1/2 whitespace-nowrap">{after}</span>
     </div>
   )
@@ -75,6 +77,8 @@ function Showcase() {
       const cards = gsap.utils.toArray('[data-card]')
       const deck = scope.current.querySelector('[data-deck]')
       const deckCards = gsap.utils.toArray('[data-deck-card]')
+      // On phones the cards enter just past the screen edge instead of far outside it.
+      const orbit = Math.min(ORBIT_RADIUS, (window.innerWidth / 2 + ORBIT_EDGE_MARGIN) / PHONE_STAGE_SCALE)
       let elapsed = 0
       let active = true
 
@@ -118,7 +122,7 @@ function Showcase() {
 
           const angle = travelled * Math.PI
           const scale = Math.sin(angle) ** 1.4
-          const x = Math.cos(angle) * ORBIT_RADIUS
+          const x = Math.cos(angle) * orbit
           const y = Number(card.dataset.y) * scale
 
           card.style.visibility = 'visible'
@@ -137,8 +141,8 @@ function Showcase() {
   )
 
   return (
-    <div ref={scope} className="px-page pt-[102px]">
-      <ScaledStage width={STAGE.width} height={STAGE.height}>
+    <div ref={scope} className="overflow-x-clip px-page pt-[102px]">
+      <ScaledStage width={STAGE.width} height={STAGE.height} minScale={PHONE_STAGE_SCALE}>
         {slots.map(({ left, top, w, h, y, layers, dark }, index) => (
           <div
             key={index}
@@ -323,7 +327,7 @@ function SideProjects() {
 
 function BrandLogo({ src, alt, box, width, height }) {
   return (
-    <div className="flex h-[100px] shrink-0 items-center justify-center" style={{ width: box }}>
+    <div className="flex h-[100px] shrink-0 items-center justify-center max-sm:h-16 max-sm:!w-[130px]" style={{ width: box }}>
       <img src={src} alt={alt} width={width} height={height} />
     </div>
   )
@@ -336,7 +340,7 @@ function Testimonials() {
         <h2 className="max-w-[223px]">Honest impressions from the founders</h2>
         <p className="max-w-[170px] text-right">What it’s like to work with me.</p>
       </div>
-      <div data-reveal className="mt-10 flex flex-wrap items-center justify-center gap-6 lg:mt-[62px] lg:flex-nowrap">
+      <div data-reveal className="mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-6 sm:gap-6 lg:mt-[62px] lg:flex-nowrap">
         <div className="order-2 lg:order-1">
           <BrandLogo src="/images/home/logo-fleetkit.svg" alt="Fleetkit" box={204} width={108} height={22} />
         </div>

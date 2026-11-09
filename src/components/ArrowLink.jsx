@@ -12,7 +12,7 @@ const arrow = (
 
 // Renders plain text until the destination exists.
 function ArrowLink({ to, children }) {
-  const classes = 'group inline-flex items-center gap-1 whitespace-nowrap text-base-lg leading-6 text-muted transition-colors duration-200 hover:text-ink'
+  const classes = 'group relative inline-flex before:absolute before:inset-x-0 before:-inset-y-2.5 items-center gap-1 whitespace-nowrap text-base-lg leading-6 text-muted transition-colors duration-200 hover:text-ink'
 
   if (!to) {
     return <span className={classes}>{children}{arrow}</span>

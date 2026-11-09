@@ -4,11 +4,11 @@ import { nav, site } from '../data/site.js'
 import { scrollToTarget, setScrollLocked } from '../lib/motion.js'
 
 const link = 'leading-[1.4] transition-opacity duration-200 hover:opacity-60'
-const reveal = 'block transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none'
+const reveal = 'block transition-transform duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none'
 const menuRow = 'block overflow-hidden text-[40px] leading-[1.25] tracking-[-0.02em]'
 const footerCell = 'flex h-[72px] items-center justify-center text-[16px]'
-const MENU_LINK_STAGGER = 60
-const MENU_LINK_DELAY = 160
+const MENU_LINK_STAGGER = 40
+const MENU_LINK_DELAY = 80
 const MENU_BREAKPOINT = '(min-width: 768px)'
 
 function MenuIcon({ open }) {
@@ -68,7 +68,7 @@ function Header() {
 
   return (
     <header className={`absolute inset-x-0 top-0 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page font-nav text-[14px] tracking-[-0.006em] sm:text-nav ${open ? 'z-50 text-white' : 'z-20 text-black'}`}>
-      <Link to="/" onClick={() => setMenu(false)} className={`${link} relative z-10 font-bold uppercase`}>{site.brand}</Link>
+      <Link to="/" onClick={() => setMenu(false)} className={`${link} relative z-10 font-bold uppercase before:absolute before:-inset-x-2 before:-inset-y-3`}>{site.brand}</Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-8 md:flex lg:gap-12">
         {nav.map((item) => (
@@ -90,7 +90,7 @@ function Header() {
 
       <div
         id="mobile-menu"
-        className={`fixed inset-0 flex flex-col bg-void text-white transition-[clip-path,visibility] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:hidden ${open ? 'visible [clip-path:inset(0)]' : 'invisible [clip-path:inset(0_0_100%_0)]'}`}
+        className={`fixed inset-0 flex flex-col bg-void text-white transition-[clip-path,visibility] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:hidden ${open ? 'visible [clip-path:inset(0)]' : 'invisible [clip-path:inset(0_0_100%_0)]'}`}
       >
         <nav aria-label="Mobile" className="flex flex-1 flex-col justify-center px-page font-sans">
           {nav.map((item, index) => (
