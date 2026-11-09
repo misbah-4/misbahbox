@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .originkit/
 design-originals/
+.vercel
+.env*

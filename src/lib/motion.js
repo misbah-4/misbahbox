@@ -17,6 +17,12 @@ export const setLenis = (instance) => {
   lenis = instance
 }
 
+export const setScrollLocked = (locked) => {
+  document.documentElement.style.overflow = locked ? 'hidden' : ''
+  if (locked) lenis?.stop()
+  else lenis?.start()
+}
+
 export const scrollToTarget = (target, options) => {
   if (lenis) lenis.scrollTo(target, options)
   else if (target === 0) window.scrollTo(0, 0)
