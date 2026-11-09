@@ -449,7 +449,6 @@ function Home() {
       <SelectedWorks />
       <SideProjects />
       <Testimonials />
-      <div className="h-16 lg:h-[138px]" />
     </>
   )
 }

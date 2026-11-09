@@ -48,6 +48,7 @@ const draftTestimonials = import.meta.env.DEV
       {
         brand: 'Fleetkit',
         name: '[Name needed]',
+        avatar: '/images/home/avatar-fleetkit.webp',
         logo: '/images/home/logo-fleetkit.svg',
         width: 108,
         box: 204,
@@ -56,6 +57,7 @@ const draftTestimonials = import.meta.env.DEV
       {
         brand: 'Acemyx',
         name: 'Abdurrahman',
+        avatar: '/images/home/avatar-acemyx.webp',
         logo: '/images/profile/logo-acemyx.svg',
         width: 117,
         height: 30,

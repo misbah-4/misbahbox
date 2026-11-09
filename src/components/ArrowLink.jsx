@@ -11,8 +11,12 @@ const arrow = (
 )
 
 // Renders plain text until the destination exists.
-function ArrowLink({ to, children }) {
+function ArrowLink({ to, href, children }) {
   const classes = 'group relative inline-flex before:absolute before:inset-x-0 before:-inset-y-2.5 items-center gap-1 whitespace-nowrap text-base-lg leading-6 text-muted transition-colors duration-200 hover:text-ink'
+
+  if (href) {
+    return <a href={href} target="_blank" rel="noreferrer" className={classes}>{children}{arrow}</a>
+  }
 
   if (!to) {
     return <span className={classes}>{children}{arrow}</span>

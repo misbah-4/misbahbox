@@ -10,6 +10,8 @@ const footerCell = 'flex h-[72px] items-center justify-center text-[16px]'
 const MENU_LINK_STAGGER = 40
 const MENU_LINK_DELAY = 80
 const MENU_BREAKPOINT = '(min-width: 768px)'
+const SCROLL_THRESHOLD = 8
+const ALWAYS_VISIBLE_ZONE = 80
 
 function MenuIcon({ open }) {
   const line = 'absolute left-1/2 top-1/2 -ml-2.5 -mt-[0.75px] h-[1.5px] w-5 bg-current transition-transform duration-300 ease-out'
@@ -24,6 +26,23 @@ function MenuIcon({ open }) {
 
 function Header() {
   const [open, setOpen] = useState(false)
+  const [scrolledAway, setScrolledAway] = useState(false)
+
+  // Slides away while scrolling down and returns as soon as the visitor scrolls up.
+  useEffect(() => {
+    let last = window.scrollY
+
+    const onScroll = () => {
+      const current = window.scrollY
+      const moved = current - last
+      if (Math.abs(moved) < SCROLL_THRESHOLD) return
+      setScrolledAway(moved > 0 && current > ALWAYS_VISIBLE_ZONE)
+      last = current
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const setMenu = (next) => {
     setScrollLocked(next)
@@ -67,7 +86,9 @@ function Header() {
   const menuLinkTone = (active) => (active ? 'text-white' : 'text-white/45')
 
   return (
-    <header className={`absolute inset-x-0 top-0 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page font-nav text-[14px] tracking-[-0.006em] sm:text-nav ${open ? 'z-50 text-white' : 'z-20 text-black'}`}>
+    <>
+    {/* White plus difference blending reads black on light sections and white on dark ones. */}
+    <header className={`pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page font-nav text-[14px] tracking-[-0.006em] text-white mix-blend-difference transition-transform duration-300 ease-out focus-within:translate-y-0 motion-reduce:transition-none sm:text-nav [&>*]:pointer-events-auto ${scrolledAway && !open ? '-translate-y-full' : 'translate-y-0'}`}>
       <Link to="/" onClick={() => setMenu(false)} className={`${link} relative z-10 font-bold uppercase before:absolute before:-inset-x-2 before:-inset-y-3`}>{site.brand}</Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-8 md:flex lg:gap-12">
@@ -87,10 +108,11 @@ function Header() {
       >
         <MenuIcon open={open} />
       </button>
+    </header>
 
       <div
         id="mobile-menu"
-        className={`fixed inset-0 flex flex-col bg-void text-white transition-[clip-path,visibility] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:hidden ${open ? 'visible [clip-path:inset(0)]' : 'invisible [clip-path:inset(0_0_100%_0)]'}`}
+        className={`fixed inset-0 z-40 flex flex-col bg-void text-white transition-[clip-path,visibility] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:hidden ${open ? 'visible [clip-path:inset(0)]' : 'invisible [clip-path:inset(0_0_100%_0)]'}`}
       >
         <nav aria-label="Mobile" className="flex flex-1 flex-col justify-center px-page font-sans">
           {nav.map((item, index) => (
@@ -107,7 +129,7 @@ function Header() {
           <a href={site.socials[0].href} target="_blank" rel="noreferrer" className={footerCell}>{site.socials[0].label}</a>
         </div>
       </div>
-    </header>
+    </>
   )
 }
 

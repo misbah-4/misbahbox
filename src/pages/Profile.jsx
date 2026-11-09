@@ -16,7 +16,7 @@ function Hero() {
         <GlassKeyboard />
       </div>
       <div className="mt-8 flex justify-center lg:absolute lg:right-[78px] lg:top-[508px] lg:mt-0">
-        <ArrowLink>(Building Studione )</ArrowLink>
+        <ArrowLink href="https://studione.world">(Building Studione )</ArrowLink>
       </div>
     </section>
   )
@@ -425,7 +425,7 @@ function Philosophy() {
   return (
     <section ref={scope} className="flex justify-center px-page py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
       <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[min(7.6vw,2rem)] sm:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
-        My work is rooted in{' '}
+        Everything I make starts with{' '}
         <br className="max-sm:hidden" />
         <span className="relative whitespace-pre font-script">
           minimalism
@@ -433,9 +433,9 @@ function Philosophy() {
           <img data-philosophy-image src={`${P}/minimalism.webp`} alt="" className="absolute right-[0.56em] top-0 h-[1.625em] w-[2.73em] max-w-none object-cover" />
         </span>
         <wbr />
-        because{' '}
+        so people{' '}
         <br className="max-sm:hidden" />
-        clarity creates stronger experiences.
+        only see what matters.
       </p>
     </section>
   )
@@ -721,7 +721,7 @@ function Hobbies() {
         const fit = size / Math.max(Number(piece.dataset.width), Number(piece.dataset.height))
         const tilt = gsap.utils.random(-MAX_TILT, MAX_TILT)
         const hang = y + 16
-        const floor = Math.max(section.offsetHeight, hang + 1)
+        const floor = Math.max(window.innerHeight, hang + 1)
         const exit = floor + size
 
         gsap.set(piece, { x, y, xPercent: -50, yPercent: -50, rotation: tilt, scale: fit * 0.7, autoAlpha: 1, zIndex: (layer += 1) })
@@ -737,10 +737,7 @@ function Hobbies() {
         running.set(piece, timeline)
       })
 
-      const pointIn = (event) => {
-        const box = section.getBoundingClientRect()
-        return [event.clientX - box.left, event.clientY - box.top]
-      }
+      const pointIn = (event) => [event.clientX, event.clientY]
 
       const place = (x, y, now) => {
         last.x = x
@@ -777,7 +774,8 @@ function Hobbies() {
       media.add('(pointer: coarse)', () => {
         let nextDrop = null
         const dropAtRandom = () => {
-          drop(section.offsetWidth * gsap.utils.random(0.15, 0.85), section.offsetHeight * gsap.utils.random(0.1, 0.35))
+          const box = section.getBoundingClientRect()
+          drop(box.left + box.width * gsap.utils.random(0.15, 0.85), box.top + box.height * gsap.utils.random(0.1, 0.35))
           nextDrop = gsap.delayedCall(gsap.utils.random(AUTO_DROP_MIN, AUTO_DROP_MAX), dropAtRandom)
         }
         const inView = ScrollTrigger.create({
@@ -807,16 +805,19 @@ function Hobbies() {
   )
 
   return (
-    <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center overflow-hidden px-page">
+    <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center px-page">
       <p data-reveal className="text-center text-[clamp(1.625rem,4.67vw,5.25rem)] font-medium leading-[1.28] tracking-[-0.03em] text-black">
         <span className="md:block">Beyond design: football, video games, </span>
         <span className="text-faint md:block">still life drawings, and Arcades.</span>
       </p>
-      {PIECE_POOL.map(({ Art, width, height, limit }, index) => (
-        <div key={index} data-piece data-width={width} data-height={height} data-limit={limit} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0" style={{ width, height }}>
-          <Art />
-        </div>
-      ))}
+      {/* Pieces fall in a screen-sized layer, so only the screen's edge can cut them off. */}
+      <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
+        {PIECE_POOL.map(({ Art, width, height, limit }, index) => (
+          <div key={index} data-piece data-width={width} data-height={height} data-limit={limit} aria-hidden="true" className="invisible absolute left-0 top-0" style={{ width, height }}>
+            <Art />
+          </div>
+        ))}
+      </div>
     </section>
   )
 }

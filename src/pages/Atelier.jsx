@@ -228,7 +228,7 @@ function Atelier() {
         <Picture src="phone-blue" alt="Hand holding a phone against blue" left={2465} top={377} width={228} height={285} />
       </div>
     </section>
-    <div ref={overlay} role="dialog" aria-modal="true" aria-label="Image preview" tabIndex={-1} onClick={closePreview} className="fixed inset-0 z-30 hidden cursor-zoom-out outline-none">
+    <div ref={overlay} role="dialog" aria-modal="true" aria-label="Image preview" tabIndex={-1} onClick={closePreview} className="fixed inset-0 z-[60] hidden cursor-zoom-out outline-none">
       <div ref={backdrop} className="absolute inset-0 bg-page" />
       <img ref={previewImage} alt="" className="fixed max-w-none object-cover" />
     </div>
