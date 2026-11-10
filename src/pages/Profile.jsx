@@ -460,7 +460,7 @@ function Philosophy() {
   )
 
   return (
-    <section ref={scope} className="flex justify-center px-4 py-[104px] max-md:relative max-md:z-30 max-md:bg-page md:px-page md:py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
+    <section ref={scope} className="flex flex-col items-center px-4 py-[104px] max-md:relative max-md:z-30 max-md:bg-page md:px-page md:py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
       <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[20px] md:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
         Everything I make starts with{' '}
         <br className="max-sm:hidden" />
@@ -474,6 +474,7 @@ function Philosophy() {
         <br className="max-sm:hidden" />
         only see what matters.
       </p>
+      <p data-reveal className="mt-8 text-base-lg leading-6 text-muted md:mt-[72px]">(Design Philosophy)</p>
     </section>
   )
 }
@@ -530,10 +531,14 @@ function Community() {
         <div className="no-scrollbar -mx-page overflow-x-auto px-page md:mx-0 md:overflow-visible md:px-0">
         <div className="w-[640px] md:w-auto">
         <ScaledStage width={927} height={398}>
-          {eventCards.map(({ left, top, w, h, rotate, bg, src }) => (
-            <div key={src} className="absolute flex items-center justify-center" style={{ left, top, width: w, height: h }}>
+          {eventCards.map(({ left, top, w, h, rotate, bg, src, label }) => (
+            <div key={left} className="absolute flex items-center justify-center" style={{ left, top, width: w, height: h }}>
               <div className="relative h-[291.94px] w-[232.99px] overflow-hidden rounded transition-transform duration-300 ease-out hover:-translate-y-2" style={{ backgroundColor: bg, rotate: `${rotate}deg` }}>
-                <MeshImage src={src} alt="Community event" className="absolute left-1/2 top-2 h-[242px] w-[216px] -translate-x-1/2 rounded" />
+                {src && <MeshImage src={src} alt="Community event" className="absolute left-1/2 top-2 h-[242px] w-[216px] -translate-x-1/2 rounded" />}
+                {/* The exported lettering already carries its full tilt on the page, so it undoes the card's rotation. */}
+                {label && (
+                  <img src={label.src} alt={label.alt} width={label.width} height={label.height} className="absolute left-[calc(50%+3.16px)] top-[calc(50%+2.98px)] -translate-x-1/2 -translate-y-1/2" style={{ rotate: `${-rotate}deg` }} />
+                )}
               </div>
             </div>
           ))}
@@ -602,8 +607,8 @@ const GLITCH_WORD_GAP = 0.13
 const GLITCH_FLICKER_EVERY = 3.2
 const GLITCH_FLICKERS = [0.4, 0.8]
 const HOBBY_LINES = [
-  { text: 'Beyond design: football, video games,', tone: 'text-black' },
-  { text: 'still life drawings, and Arcades.', tone: 'text-faint' },
+  { text: 'Football, Video Gaming, Fine Art', tone: 'text-black' },
+  { text: 'Drawings, and Strategy Games.', tone: 'text-black' },
 ]
 const HOBBY_SENTENCE = HOBBY_LINES.map(({ text }) => text).join(' ')
 const SLICE_BANDS = ['inset(0 0 66% 0)', 'inset(34% 0 33% 0)', 'inset(67% 0 0 0)']
@@ -795,7 +800,7 @@ function Hobbies() {
   )
 
   return (
-    <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center px-page">
+    <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] flex-col items-center justify-center px-page">
       <p data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,3rem)] leading-[1.28] tracking-[-0.03em]">
         <span className="sr-only">{HOBBY_SENTENCE}</span>
         {HOBBY_LINES.map(({ text: line, tone }, lineIndex) => {
@@ -813,6 +818,7 @@ function Hobbies() {
           )
         })}
       </p>
+      <p data-reveal className="mt-8 text-base-lg leading-6 text-muted md:mt-[72px]">(Beyond Design)</p>
       {/* Pieces fall in a screen-sized layer, so only the screen's edge can cut them off. */}
       <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
         {PIECE_POOL.map(({ Art, width, height, limit }, index) => (

@@ -61,7 +61,7 @@ function Layout() {
         <main key={pathname}>
           <Outlet />
         </main>
-        {pathname !== '/atelier' && <Footer />}
+        {pathname !== '/atelier' && pathname !== '/profile' && <Footer />}
       </div>
     </div>
   )

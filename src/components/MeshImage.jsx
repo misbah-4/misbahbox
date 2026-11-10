@@ -4,14 +4,16 @@ import { prefersReducedMotion } from '../lib/motion.js'
 // Image version of Originkit's meshtexthover: same spring mesh, drawn over a picture.
 const GRID_W = 48
 const GRID_H = 54
-const DRAG = 1.8
+const DRAG = 4.5
 const SPRING_K = 0.08
 const DAMPING = 0.9
 const DT = 0.1
-const CHROMA = 0.012
+const CHROMA = 0.03
 const MAX_POINTER_STEP = 0.6
-const TAP_FORCE = 6
+const TAP_FORCE = 16
 const REST = 0.0002
+// How far around the pointer the mesh is pulled, in clip space.
+const REACH = 0.11
 
 const VERT_SRC = `#version 300 es
 in vec2 aPos;
@@ -33,13 +35,13 @@ in float vMag;
 out vec4 outColor;
 uniform sampler2D uTex;
 void main() {
-  vec2 offset = vec2(${CHROMA.toFixed(4)} * clamp(vMag * 8.0, 0.0, 1.0), 0.0);
+  vec2 offset = vec2(${CHROMA.toFixed(4)} * clamp(vMag * 6.0, 0.0, 1.0), 0.0);
   vec4 shifted = texture(uTex, vUv + offset);
   float green = texture(uTex, vUv - offset).g;
   outColor = vec4(shifted.r, green, shifted.b, 1.0);
 }`
 
-const proximityTo = (distance) => Math.max(0, 1 / (1 + distance / 0.05) - 0.1)
+const proximityTo = (distance) => Math.max(0, 1 / (1 + distance / REACH) - 0.1)
 
 function createShader(gl, type, source) {
   const shader = gl.createShader(type)

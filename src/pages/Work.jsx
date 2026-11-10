@@ -9,7 +9,10 @@ function Work() {
           <img src="/images/project/hero.svg" alt="" className="h-[178.33px] w-[142.44px] -rotate-169" />
         </div>
       </div>
-      <h1 data-reveal className="mt-10 text-h1 font-medium leading-[1.2] tracking-[-0.01em] text-black lg:mt-[52px]">Works</h1>
+      <div data-reveal className="mt-10 flex items-end justify-between gap-4 lg:mt-[52px]">
+        <h1 className="text-h1 font-medium leading-[1.2] tracking-[-0.01em] text-black">Works</h1>
+        <p className="text-base-lg leading-6 text-muted">(Case Studies)</p>
+      </div>
       <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-y-16">
         {works.map(({ name, tags, to }) => (
           <article key={name} data-reveal className="flex flex-col gap-6">

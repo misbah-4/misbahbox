@@ -5,7 +5,7 @@ function Footer() {
     <footer id="contact" className="mx-auto flex max-w-[1512px] flex-col gap-20 px-page pb-8 pt-24 text-ink lg:gap-[120px]">
       <div data-reveal className="text-title font-medium leading-[1.2] tracking-[-0.02em]">
         <p>
-          Let’s make <em>it</em> <em className="text-faint">worth</em> it.
+          Let’s make <em>it</em> <span className="font-script font-normal text-faint">worth</span> it.
         </p>
         <a
           href={site.mailto}
