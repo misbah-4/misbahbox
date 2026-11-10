@@ -3,7 +3,7 @@ export const site = {
   email: 'hello@misbah.com',
   mailto: 'mailto:hellodamiii@gmail.com',
   socials: [
-    { label: 'LinkedIN', href: 'https://www.linkedin.com/in/musbaudeen' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/musbaudeen' },
     { label: 'Twitter/X', href: 'https://x.com/designincues' },
     { label: 'Instagram', href: 'https://www.instagram.com/misbahbox' },
   ],

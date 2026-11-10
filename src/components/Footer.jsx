@@ -9,14 +9,14 @@ function Footer() {
         </p>
         <a
           href={site.mailto}
-          className="break-all text-[1.5rem] underline md:text-title decoration-from-font transition-opacity duration-200 hover:opacity-60 sm:break-normal"
+          className="break-all text-h3 underline md:text-title decoration-from-font transition-opacity duration-200 hover:opacity-60 sm:break-normal"
         >
           {site.email}
         </a>
       </div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <p className="text-[16px] leading-5 tracking-[0.0175em]">© 2026</p>
-        <ul className="flex items-center gap-6 text-[18px] leading-11">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 text-[16px] leading-11 md:text-[18px]">
+        <p className="tracking-[0.0175em]">© 2026</p>
+        <ul className="flex items-center gap-5 md:gap-6">
           {site.socials.map(({ label, href }) => (
             <li key={label} className="underline decoration-from-font">
               {href ? <a href={href} target="_blank" rel="noreferrer" className="inline-block">{label}</a> : label}

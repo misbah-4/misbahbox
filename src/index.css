@@ -48,7 +48,18 @@ body {
   overflow-x: clip;
 }
 
+/* Phones use four sizes only: 16 for reading and links, 20 for leads, 24 and 28 for statements. */
 @media (max-width: 767.98px) {
+  :root {
+    --text-display: 1.75rem;
+    --text-title: 1.75rem;
+    --text-h1: 1.75rem;
+    --text-h2: 1.5rem;
+    --text-h3: 1.25rem;
+    --text-lead: 1.25rem;
+    --text-body-lg: 1rem;
+    --text-base-lg: 1rem;
+  }
   h1, h2, h3 { text-wrap: balance; }
 }
 

@@ -12,22 +12,25 @@ const MENU_LINK_DELAY = 80
 const MENU_BREAKPOINT = '(min-width: 768px)'
 const SCROLL_THRESHOLD = 8
 const ALWAYS_VISIBLE_ZONE = 80
-const HEADER_CENTRE_Y = 39
+const HEADER_CENTRE_Y = 32
 const DARK_BELOW = 128
 
+const PAGE_BACKGROUND = { color: 'rgb(250, 250, 250)', dark: false }
+
 // Finds the first solid background behind the header, ignoring pictures.
-function isDarkBehindHeader(header) {
+function backgroundBehindHeader(header) {
   const stack = document.elementsFromPoint(window.innerWidth / 2, HEADER_CENTRE_Y)
 
   for (const element of stack) {
     if (header.contains(element) || element.tagName === 'IMG' || element.tagName === 'CANVAS') continue
-    const channels = getComputedStyle(element).backgroundColor.match(/^rgba?\(([^)]+)\)/)?.[1].split(/[ ,/]+/).map(Number)
+    const color = getComputedStyle(element).backgroundColor
+    const channels = color.match(/^rgba?\(([^)]+)\)/)?.[1].split(/[ ,/]+/).map(Number)
     if (!channels || (channels.length > 3 && channels[3] < 0.5)) continue
     const [red, green, blue] = channels
-    return 0.299 * red + 0.587 * green + 0.114 * blue < DARK_BELOW
+    return { color: `rgb(${red}, ${green}, ${blue})`, dark: 0.299 * red + 0.587 * green + 0.114 * blue < DARK_BELOW }
   }
 
-  return false
+  return PAGE_BACKGROUND
 }
 
 function MenuIcon({ open }) {
@@ -44,7 +47,7 @@ function MenuIcon({ open }) {
 function Header() {
   const [open, setOpen] = useState(false)
   const [scrolledAway, setScrolledAway] = useState(false)
-  const [overDark, setOverDark] = useState(false)
+  const [behind, setBehind] = useState(PAGE_BACKGROUND)
   const headerRef = useRef(null)
 
   // Slides away while scrolling down and returns as soon as the visitor scrolls up.
@@ -54,7 +57,8 @@ function Header() {
 
     const checkBackground = () => {
       queued = false
-      setOverDark(isDarkBehindHeader(headerRef.current))
+      const next = backgroundBehindHeader(headerRef.current)
+      setBehind((now) => (now.color === next.color ? now : next))
     }
     const queueBackgroundCheck = () => {
       if (queued) return
@@ -123,7 +127,7 @@ function Header() {
 
   return (
     <>
-    <header ref={headerRef} className={`pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex h-[78px] max-w-[1512px] items-center justify-between px-page text-[14px] tracking-[-0.006em] transition-[translate,color] duration-300 ease-out focus-within:translate-y-0 motion-reduce:transition-none sm:text-nav [&>*]:pointer-events-auto ${scrolledAway && !open ? '-translate-y-full' : 'translate-y-0'} ${open || overDark ? 'text-white' : 'text-black'}`}>
+    <header ref={headerRef} style={{ '--header-bg': open ? 'transparent' : behind.color }} className={`pointer-events-none fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between bg-(--header-bg) px-[max(var(--spacing-page),calc((100%-1512px)/2+var(--spacing-page)))] text-[14px] tracking-[-0.006em] transition-[translate,color,background-color] duration-300 ease-out md:h-[78px] focus-within:translate-y-0 motion-reduce:transition-none sm:text-nav [&>*]:pointer-events-auto ${scrolledAway && !open ? '-translate-y-full' : 'translate-y-0'} ${open || behind.dark ? 'text-white' : 'text-black'}`}>
       <Link to="/" onClick={() => setMenu(false)} className={`${link} relative z-10 font-bold uppercase before:absolute before:-inset-x-2 before:-inset-y-3`}>{site.brand}</Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-8 md:flex lg:gap-12">

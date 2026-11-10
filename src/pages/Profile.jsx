@@ -10,9 +10,9 @@ const P = '/images/profile'
 
 function Hero() {
   return (
-    <section className="relative mx-auto max-w-[1512px] px-page pb-12 pt-[120px] lg:h-[594px] lg:pb-0 lg:pt-[175px]">
+    <section className="relative mx-auto flex min-h-svh max-w-[1512px] flex-col items-center justify-center px-page pb-12 pt-[78px] lg:block lg:h-[594px] lg:min-h-0 lg:pb-0 lg:pt-[175px]">
       {/* The key is lit for black: inverting it and multiplying drops the black and keeps its colours. */}
-      <div className="mx-auto size-[clamp(180px,18.1vw,274px)] mix-blend-multiply invert hue-rotate-180 lg:translate-x-0.5">
+      <div className="mx-auto size-[min(64vw,274px)] mix-blend-multiply lg:size-[clamp(180px,18.1vw,274px)] invert hue-rotate-180 lg:translate-x-0.5">
         <GlassKeyboard />
       </div>
       <div className="mt-8 flex justify-center lg:absolute lg:right-[78px] lg:top-[508px] lg:mt-0">
@@ -144,16 +144,16 @@ function Intro() {
 
   return (
     <section ref={scope} className="@container relative z-10 overflow-hidden bg-night text-white">
-      <div data-intro-content className="relative mx-auto flex max-w-[1512px] flex-col items-center gap-10 px-page py-20 [--u:min(100cqw/1512,1px)] md:block md:h-[calc(var(--u)*760)] md:p-0">
+      <div data-intro-content className="relative mx-auto flex max-w-[1512px] flex-col items-center gap-8 px-page py-20 [--u:min(100cqw/1512,1px)] md:block md:h-[calc(var(--u)*760)] md:p-0">
         <h1 className="text-h1 font-medium leading-[1.28] tracking-[0.16px] md:absolute md:left-[calc(var(--u)*256)] md:top-[calc(var(--u)*302)] md:whitespace-nowrap md:text-[calc(var(--u)*48)]">
           Hi, I’m <em className="font-normal">Misbah</em>
         </h1>
-        <div data-intro-card role="img" aria-label="Portfolio page preview" className="relative h-[347px] w-[295px] overflow-hidden rounded-[2.5px] md:absolute md:left-[calc(var(--u)*600)] md:top-[calc(var(--u)*176)] md:h-[calc(var(--u)*347)] md:w-[calc(var(--u)*295)]">
+        <div data-intro-card role="img" aria-label="Portfolio page preview" className="relative h-[259px] w-[220px] overflow-hidden rounded-[2.5px] md:absolute md:left-[calc(var(--u)*600)] md:top-[calc(var(--u)*176)] md:h-[calc(var(--u)*347)] md:w-[calc(var(--u)*295)]">
           {INTRO_IMAGES.map((src, index) => (
             <img key={src} src={src} alt="" className={`absolute inset-0 size-full object-cover ${index === INTRO_IMAGES.length - 1 ? '' : 'invisible'}`} />
           ))}
         </div>
-        <p className="max-w-[386px] text-center text-lead leading-[1.2] tracking-[0.01em] text-[#f5f5f5] md:absolute md:left-[calc(var(--u)*959)] md:top-[calc(var(--u)*289)] md:w-[calc(var(--u)*386)] md:max-w-none md:text-left md:text-[calc(var(--u)*28)]">
+        <p className="max-w-[320px] text-center text-lead leading-[1.3] md:max-w-[386px] md:leading-[1.2] tracking-[0.01em] text-[#f5f5f5] md:absolute md:left-[calc(var(--u)*959)] md:top-[calc(var(--u)*289)] md:w-[calc(var(--u)*386)] md:max-w-none md:text-left md:text-[calc(var(--u)*28)]">
           I’m a product designer and developer. I turn early ideas into products people find easy to use.
         </p>
       </div>
@@ -343,7 +343,7 @@ function Focus() {
           .timeline({
             defaults: { ease: 'none' },
             onUpdate: render,
-            scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom bottom', scrub: 0.3, onRefresh: measure },
+            scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom 200%', scrub: 0.3, onRefresh: measure },
           })
           .to(state, { open: 1, duration: 0.4 }, 0)
           .to(state, { head: last + FOCUS_HEAD_LEAD, duration: 5 }, 0)
@@ -359,7 +359,7 @@ function Focus() {
   )
 
   return (
-    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[240svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
+    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[320svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
       <div data-focus-frame className="absolute inset-x-0 bottom-0 top-0 bg-night" />
       {reduced ? (
         <h2 className="relative w-full max-w-[777px] text-center text-display font-medium leading-[1.28] tracking-[-0.006em]">{FOCUS_SENTENCE}</h2>
@@ -423,8 +423,8 @@ function Philosophy() {
   )
 
   return (
-    <section ref={scope} className="flex justify-center px-page py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
-      <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[min(7.6vw,2rem)] sm:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
+    <section ref={scope} className="flex justify-center px-page py-24 max-md:relative max-md:z-30 max-md:min-h-svh max-md:items-center max-md:bg-page max-md:motion-safe:-mt-[100svh] lg:h-[633px] lg:py-0 lg:pt-[201px]">
+      <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-h2 md:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
         Everything I make starts with{' '}
         <br className="max-sm:hidden" />
         <span className="relative whitespace-pre font-script">
@@ -473,7 +473,7 @@ function PartnerMarquee() {
         {MARQUEE_COPIES.flatMap((copy) =>
           partnerLogos.map(({ src, alt, width, box }) => (
             <div key={`${copy}-${alt}`} className="shrink-0 pr-8 lg:pr-10" aria-hidden={copy > 0}>
-              <LogoBox box={box}><img src={src} alt={copy > 0 ? '' : alt} width={width} className="max-w-[140px] lg:max-w-none" /></LogoBox>
+              <LogoBox box={box}><img src={src} alt={copy > 0 ? '' : alt} width={width} className="max-lg:h-4 max-lg:w-auto lg:max-w-none" /></LogoBox>
             </div>
           )),
         )}
@@ -514,7 +514,7 @@ function Pointer({ src, left, top, transform }) {
 
 function RoleLabel({ left, top, width, bg, color, children }) {
   return (
-    <div className="absolute flex h-[24.719px] items-center justify-center whitespace-nowrap rounded-[18.681px] p-[7.784px] text-[7.914px] font-medium leading-[1.2] tracking-[0.0791px] max-sm:h-7 max-sm:!w-auto max-sm:text-[14px]" style={{ left, top, width, backgroundColor: bg, color }}>
+    <div className="absolute flex h-[24.719px] items-center justify-center whitespace-nowrap rounded-[18.681px] p-[7.784px] text-[7.914px] font-medium leading-[1.2] tracking-[0.0791px] max-sm:h-8 max-sm:!w-auto max-sm:text-[16px]" style={{ left, top, width, backgroundColor: bg, color }}>
       {children}
     </div>
   )
@@ -576,7 +576,7 @@ function CommunityIllustration() {
           </div>
           <img loading="lazy" decoding="async" src={`${P}/ill-thumb.webp`} alt="" className="absolute left-[150px] top-[132px] size-[30px] max-w-none rounded-[12px] object-cover max-sm:left-[124px]" />
           <div data-pill-text>
-            <p className="absolute left-[186px] top-[134px] whitespace-nowrap text-[8px] leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:left-[160px] max-sm:top-[137px] max-sm:text-[15px] max-sm:font-medium">Community Led Events</p>
+            <p className="absolute left-[186px] top-[134px] whitespace-nowrap text-[8px] leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:left-[160px] max-sm:top-[136px] max-sm:text-[17px] max-sm:font-medium">Community Led Events</p>
             <p className="absolute left-[186px] top-[147px] whitespace-nowrap text-[8px] font-medium leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:hidden">Engaging Community Gatherings</p>
           </div>
         </div>
@@ -615,17 +615,17 @@ function CommunityIllustration() {
 function Community() {
   return (
     <section className="overflow-hidden bg-void px-page pb-20 pt-16 text-white lg:h-[1467px] lg:pb-0 lg:pt-[84px]">
-      <div className="mx-auto max-w-[440px] lg:-translate-x-[17px]">
+      <div className="mx-auto max-w-[300px] sm:max-w-[440px] lg:-translate-x-[17px]">
         <CommunityIllustration />
       </div>
-      <h2 data-reveal className="mx-auto mt-[80px] max-w-[413px] text-center text-h2 leading-[1.2]">
+      <h2 data-reveal className="mx-auto mt-16 max-w-[413px] text-center text-h3 leading-[1.2] md:mt-[80px] md:text-h2">
         Communities I’ve built with
       </h2>
       <div data-reveal className="mx-auto mt-16 flex max-w-[1206px] flex-wrap items-center justify-center gap-x-8 opacity-60 lg:mt-[120px] lg:flex-nowrap lg:gap-x-10">
         {communityLogos.map(({ src, alt, box }) => (
-          <LogoBox key={alt} box={box}><img src={src} alt={alt} /></LogoBox>
+          <LogoBox key={alt} box={box}><img src={src} alt={alt} className="max-lg:h-6 max-lg:w-auto" /></LogoBox>
         ))}
-        <LogoBox box={217}><img src={`${P}/logo-updates.svg`} alt="Updates" width="217" height="100" className="max-w-[140px] lg:max-w-none" /></LogoBox>
+        <LogoBox box={217}><img src={`${P}/logo-updates.svg`} alt="Updates" width="217" height="100" className="max-lg:h-[46px] max-lg:w-auto lg:max-w-none" /></LogoBox>
       </div>
       <div data-reveal className="mx-auto mt-16 max-w-[927px] lg:mt-[149px]">
         <div className="no-scrollbar -mx-page overflow-x-auto px-page md:mx-0 md:overflow-visible md:px-0">
@@ -688,14 +688,12 @@ const HOBBY_PIECES = [
 ]
 const PIECE_POOL = [...HOBBY_PIECES, ...HOBBY_PIECES, ...HOBBY_PIECES]
 
-const SPAWN_DISTANCE = 130
+const spawnDistance = () => Math.min(130, window.innerWidth * 0.2)
 const SPAWN_GAP_MS = 90
 const GRAVITY = 3000
 const HOP = 70
 const MAX_TILT = 12
-const AUTO_DROP_MIN = 0.6
-const AUTO_DROP_MAX = 1.1
-const pieceSize = () => gsap.utils.clamp(110, 288, window.innerWidth * 0.16)
+const pieceSize = () => gsap.utils.clamp(64, 288, window.innerWidth * 0.16)
 const fallTime = (distance) => Math.sqrt((2 * Math.max(distance, 1)) / GRAVITY)
 
 function Hobbies() {
@@ -705,7 +703,7 @@ function Hobbies() {
     (_, contextSafe) => {
       if (prefersReducedMotion()) return undefined
 
-      const section = scope.current
+      const words = scope.current.querySelector('[data-hobby-words]')
       const pieces = gsap.utils.toArray('[data-piece]')
       const running = new Map()
       const last = { x: 0, y: 0, time: 0, placed: false }
@@ -756,7 +754,7 @@ function Hobbies() {
           last.placed = true
           return
         }
-        if (Math.hypot(x - last.x, y - last.y) >= SPAWN_DISTANCE && now - last.time >= SPAWN_GAP_MS) place(x, y, now)
+        if (Math.hypot(x - last.x, y - last.y) >= spawnDistance() && now - last.time >= SPAWN_GAP_MS) place(x, y, now)
       }
       const onLeave = () => {
         last.placed = false
@@ -765,40 +763,15 @@ function Hobbies() {
         if (event.pointerType === 'touch') place(...pointIn(event), performance.now())
       }
 
-      section.addEventListener('pointermove', onMove)
-      section.addEventListener('pointerleave', onLeave)
-      section.addEventListener('pointerdown', onDown)
-
-      // Touch screens have no cursor to follow, so pieces fall on their own while in view.
-      const media = gsap.matchMedia()
-      media.add('(pointer: coarse)', () => {
-        let nextDrop = null
-        const dropAtRandom = () => {
-          const box = section.getBoundingClientRect()
-          drop(box.left + box.width * gsap.utils.random(0.15, 0.85), box.top + box.height * gsap.utils.random(0.1, 0.35))
-          nextDrop = gsap.delayedCall(gsap.utils.random(AUTO_DROP_MIN, AUTO_DROP_MAX), dropAtRandom)
-        }
-        const inView = ScrollTrigger.create({
-          trigger: section,
-          start: 'top 80%',
-          end: 'bottom 20%',
-          onToggle: (self) => {
-            nextDrop?.kill()
-            if (self.isActive) dropAtRandom()
-          },
-        })
-
-        return () => {
-          nextDrop?.kill()
-          inView.kill()
-        }
-      })
+      // Pieces fall only where the visitor taps or moves across the words.
+      words.addEventListener('pointermove', onMove)
+      words.addEventListener('pointerleave', onLeave)
+      words.addEventListener('pointerdown', onDown)
 
       return () => {
-        media.revert()
-        section.removeEventListener('pointermove', onMove)
-        section.removeEventListener('pointerleave', onLeave)
-        section.removeEventListener('pointerdown', onDown)
+        words.removeEventListener('pointermove', onMove)
+        words.removeEventListener('pointerleave', onLeave)
+        words.removeEventListener('pointerdown', onDown)
       }
     },
     { scope },
@@ -806,7 +779,7 @@ function Hobbies() {
 
   return (
     <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center px-page">
-      <p data-reveal className="text-center text-[clamp(1.625rem,4.67vw,5.25rem)] font-medium leading-[1.28] tracking-[-0.03em] text-black">
+      <p data-reveal data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,5.25rem)] leading-[1.28] tracking-[-0.03em] text-black">
         <span className="md:block">Beyond design: football, video games, </span>
         <span className="text-faint md:block">still life drawings, and Arcades.</span>
       </p>

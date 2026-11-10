@@ -58,7 +58,7 @@ function DeckLabel({ className }) {
   const [before, after] = moodboardLabel
 
   return (
-    <div className={`absolute inset-0 text-[14px] uppercase leading-none max-sm:text-[18px] ${className}`}>
+    <div className={`absolute inset-0 text-[14px] uppercase leading-none max-sm:text-[16px] ${className}`}>
       <span className="absolute left-[-44px] top-1/2 -translate-y-1/2 whitespace-nowrap max-sm:left-[-66px]">{before}</span>
       <span className="absolute left-[151px] top-1/2 -translate-y-1/2 whitespace-nowrap">{after}</span>
     </div>
@@ -199,7 +199,7 @@ function Intro() {
         <h1 className="text-h1 font-medium leading-[1.2] tracking-[0.01em] text-black">
           I’m a Product Designer / <span className="text-soft">Engineer.</span>
         </h1>
-        <p className="rounded-3xl bg-stone px-4 py-2 text-[18px] leading-[1.4] tracking-[0.02em] text-black">Open to work</p>
+        <p className="rounded-3xl bg-stone px-4 py-2 text-[16px] leading-[1.4] md:text-[18px] tracking-[0.02em] text-black">Open to work</p>
       </div>
       <div data-reveal className="flex w-full max-w-[531px] flex-col items-start gap-8 lg:gap-12">
         <p className="text-body-lg leading-[1.4] tracking-[0.02em] text-black lg:h-[92px]">
@@ -240,7 +240,7 @@ function WorkCard({ name, cta, to }) {
   return (
     <article className="group/card flex w-[min(84vw,541px)] shrink-0 flex-col items-center gap-6 lg:w-[541px]">
       {to ? <Link to={to} aria-label={`${name} case study`} className="block w-full">{image}</Link> : image}
-      <div className="flex w-full items-center justify-between gap-4 px-4 lg:w-[461px] lg:px-0">
+      <div className="flex w-full items-center justify-between gap-4 px-4 max-md:*:text-[14px] lg:w-[461px] lg:px-0">
         <h3 className="text-base-lg font-medium uppercase leading-6 text-ink">{name}</h3>
         <ArrowLink to={to}>{cta}</ArrowLink>
       </div>
@@ -341,11 +341,11 @@ function BrandLogo({ brand, logo, width, height = 22, box, onSelect }) {
       data-swap
       aria-label={`Read the ${brand} testimonial`}
       onClick={onSelect}
-      className="flex h-[100px] shrink-0 cursor-pointer items-center justify-center transition-opacity duration-150 hover:opacity-60 max-sm:h-16 max-sm:!w-[130px]"
+      className="flex h-[100px] shrink-0 cursor-pointer items-center justify-center transition-opacity duration-150 hover:opacity-60 max-sm:h-12 max-sm:!w-[104px]"
       style={{ width: box }}
     >
       {logo
-        ? <img src={logo} alt="" width={width} height={height} />
+        ? <img src={logo} alt="" width={width} height={height} style={{ '--logo-h': `${height}px` }} className="max-sm:h-[calc(var(--logo-h)*0.7)] max-sm:w-auto" />
         : <span className="font-medium uppercase tracking-[0.04em] text-black/20">{brand}</span>}
     </button>
   )
