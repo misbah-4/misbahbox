@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import ArrowLink from '../components/ArrowLink.jsx'
 import MeshImage from '../components/MeshImage.jsx'
 import GlassKeyboard from '../components/originkit/ui/single-glass-keyboard-custom-style.tsx'
@@ -595,6 +595,67 @@ const MAX_TILT = 12
 const pieceSize = () => gsap.utils.clamp(64, 288, window.innerWidth * 0.16)
 const fallTime = (distance) => Math.sqrt((2 * Math.max(distance, 1)) / GRAVITY)
 
+// The page's own accents, used for the glitch instead of the reference's colours.
+const GLITCH_COLORS = ['#fd6e36', '#0038ff', '#78fda5', '#fafd86']
+const GLITCH_FRAME = 0.045
+const GLITCH_WORD_GAP = 0.13
+const GLITCH_FLICKER_EVERY = 3.2
+const GLITCH_FLICKERS = [0.4, 0.8]
+const HOBBY_LINES = [
+  { text: 'Beyond design: football, video games,', tone: 'text-black' },
+  { text: 'still life drawings, and Arcades.', tone: 'text-faint' },
+]
+const HOBBY_SENTENCE = HOBBY_LINES.map(({ text }) => text).join(' ')
+const SLICE_BANDS = ['inset(0 0 66% 0)', 'inset(34% 0 33% 0)', 'inset(67% 0 0 0)']
+const SPECKS = [[18, 108], [30, 118], [42, 104]]
+
+// Repeatable pseudo-random numbers, so each word keeps its own shard layout.
+const seeded = (seed) => {
+  const value = Math.sin(seed * 12.9898) * 43758.5453
+  return value - Math.floor(value)
+}
+
+const rgbSplit = (amount) => (amount
+  ? `${-0.07 * amount}em 0 ${GLITCH_COLORS[1]}, ${0.07 * amount}em 0 ${GLITCH_COLORS[0]}, 0 ${0.05 * amount}em ${GLITCH_COLORS[3]}`
+  : 'none')
+
+function GlitchWord({ word, index }) {
+  const shards = [0, 1, 2].map((n) => {
+    const r = (k) => seeded(index * 7 + n * 3 + k)
+    return {
+      left: `${-8 + r(1) * 50}%`,
+      top: `${-25 + r(2) * 40}%`,
+      width: `${45 + r(3) * 45}%`,
+      height: `${70 + r(4) * 50}%`,
+      rotate: `${-14 + r(5) * 28}deg`,
+      background: GLITCH_COLORS[(index + n) % GLITCH_COLORS.length],
+      clipPath: `polygon(${r(6) * 18}% 0, 100% ${r(7) * 22}%, ${82 + r(8) * 18}% 100%, 0 ${78 + r(9) * 22}%)`,
+    }
+  })
+
+  return (
+    <span data-word className="relative inline-block">
+      <span data-word-text>{word}</span>
+      <span data-shards aria-hidden="true" className="pointer-events-none invisible absolute inset-0">
+        {shards.map((style, n) => (
+          <span key={n} className="absolute" style={style} />
+        ))}
+        <span className="absolute inset-0 text-white [-webkit-text-stroke:0.035em_#0a0a0a] [paint-order:stroke]">{word}</span>
+      </span>
+      <span data-slices aria-hidden="true" className="pointer-events-none invisible absolute inset-0">
+        {SLICE_BANDS.map((band, n) => (
+          <span key={band} data-slice className="absolute inset-0" style={{ clipPath: band, color: GLITCH_COLORS[(index + n + 1) % GLITCH_COLORS.length] }}>
+            {word}
+          </span>
+        ))}
+        {SPECKS.map(([left, top]) => (
+          <span key={left} className="absolute size-[0.12em] rounded-full bg-[#f44a32]" style={{ left: `${left + seeded(index + left) * 40}%`, top: `${top}%` }} />
+        ))}
+      </span>
+    </span>
+  )
+}
+
 function Hobbies() {
   const scope = useRef(null)
 
@@ -667,7 +728,64 @@ function Hobbies() {
       words.addEventListener('pointerleave', onLeave)
       words.addEventListener('pointerdown', onDown)
 
+      // Each word arrives as colour shards, breaks into slices, then settles out of a colour split.
+      const wordEls = gsap.utils.toArray('[data-word]', words)
+      const glitching = new Set()
+      const glitch = (word) => {
+        const label = word.querySelector('[data-word-text]')
+        const shards = word.querySelector('[data-shards]')
+        const slices = word.querySelector('[data-slices]')
+        glitching.add(word)
+
+        return gsap
+          .timeline({ onComplete: () => glitching.delete(word) })
+          .set(label, { visibility: 'hidden', textShadow: 'none' }, 0)
+          .set(shards, { visibility: 'visible' }, 0)
+          .set(shards, { visibility: 'hidden' }, GLITCH_FRAME * 2)
+          .set(word.querySelectorAll('[data-slice]'), { x: () => `${gsap.utils.random(-0.18, 0.18)}em` }, GLITCH_FRAME * 2)
+          .set(slices, { visibility: 'visible' }, GLITCH_FRAME * 2)
+          .set(slices, { visibility: 'hidden' }, GLITCH_FRAME * 4)
+          .set(label, { visibility: 'visible', textShadow: rgbSplit(1) }, GLITCH_FRAME * 4)
+          .set(label, { textShadow: rgbSplit(0.6) }, GLITCH_FRAME * 5)
+          .set(label, { textShadow: rgbSplit(0.3) }, GLITCH_FRAME * 6)
+          .set(label, { textShadow: rgbSplit(0) }, GLITCH_FRAME * 8)
+      }
+
+      const glitchRandomWord = () => {
+        const resting = wordEls.filter((word) => !glitching.has(word))
+        if (resting.length) glitch(gsap.utils.random(resting))
+      }
+
+      // The line is written once; after that single words flicker on their own, forever.
+      const typeIn = gsap.timeline({ paused: true })
+      wordEls.forEach((word, index) => {
+        typeIn.add(() => {
+          glitch(word)
+        }, index * GLITCH_WORD_GAP)
+      })
+      typeIn.set({}, {}, wordEls.length * GLITCH_WORD_GAP + GLITCH_FRAME * 8)
+
+      const flicker = gsap.timeline({ paused: true, repeat: -1 })
+      GLITCH_FLICKERS.forEach((share) => flicker.add(glitchRandomWord, GLITCH_FLICKER_EVERY * share))
+      flicker.set({}, {}, GLITCH_FLICKER_EVERY)
+      typeIn.eventCallback('onComplete', () => flicker.paused(!inView.isActive))
+
+      gsap.set('[data-word-text]', { visibility: 'hidden' })
+      const inView = ScrollTrigger.create({
+        trigger: words,
+        start: 'top 75%',
+        end: 'bottom top',
+        onToggle: (self) => {
+          if (!typeIn.progress()) typeIn.play()
+          if (typeIn.progress() === 1) flicker.paused(!self.isActive)
+        },
+      })
+
       return () => {
+        inView.kill()
+        typeIn.kill()
+        flicker.kill()
+        gsap.set('[data-word-text]', { visibility: 'visible', textShadow: 'none' })
         words.removeEventListener('pointermove', onMove)
         words.removeEventListener('pointerleave', onLeave)
         words.removeEventListener('pointerdown', onDown)
@@ -678,9 +796,22 @@ function Hobbies() {
 
   return (
     <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center px-page">
-      <p data-reveal data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,5.25rem)] leading-[1.28] tracking-[-0.03em] text-black">
-        <span className="md:block">Beyond design: football, video games, </span>
-        <span className="text-faint md:block">still life drawings, and Arcades.</span>
+      <p data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,5.25rem)] leading-[1.28] tracking-[-0.03em]">
+        <span className="sr-only">{HOBBY_SENTENCE}</span>
+        {HOBBY_LINES.map(({ text: line, tone }, lineIndex) => {
+          const before = HOBBY_LINES.slice(0, lineIndex).reduce((count, { text: earlier }) => count + earlier.split(' ').length, 0)
+          return (
+            <span key={line} aria-hidden="true" className={`md:block ${tone}`}>
+              {line.split(' ').map((word, index) => (
+                <Fragment key={word}>
+                  {index > 0 && ' '}
+                  <GlitchWord word={word} index={before + index} />
+                </Fragment>
+              ))}
+              {lineIndex < HOBBY_LINES.length - 1 && ' '}
+            </span>
+          )
+        })}
       </p>
       {/* Pieces fall in a screen-sized layer, so only the screen's edge can cut them off. */}
       <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
