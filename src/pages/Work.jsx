@@ -5,7 +5,9 @@ function Work() {
   return (
     <div className="mx-auto max-w-[1512px] px-page">
       <div className="pt-[110px] lg:pl-[39.9%]">
-        <img src="/images/work/mascot.webp" alt="Pixel mascot typing on a laptop" width="312" height="312" className="mx-auto size-[clamp(180px,20.64vw,312px)] lg:mx-0" />
+        <div className="mx-auto flex h-[202px] w-[174px] items-center justify-center lg:mx-0">
+          <img src="/images/project/hero.svg" alt="" className="h-[178.33px] w-[142.44px] -rotate-169" />
+        </div>
       </div>
       <h1 data-reveal className="mt-10 text-h1 font-medium leading-[1.2] tracking-[-0.01em] text-black lg:mt-[52px]">Works</h1>
       <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-y-16">

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ArrowLink from '../components/ArrowLink.jsx'
 import MeshImage from '../components/MeshImage.jsx'
 import GlassKeyboard from '../components/originkit/ui/single-glass-keyboard-custom-style.tsx'
@@ -8,12 +8,32 @@ import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from '../lib/motio
 
 const P = '/images/profile'
 
+const KEY_RESUME_MS = 180
+
 function Hero() {
+  const [scrolling, setScrolling] = useState(false)
+
+  // The key redraws every frame; on phones that competes with scrolling, so it rests until the page stops.
+  useEffect(() => {
+    if (!window.matchMedia('(pointer: coarse)').matches) return undefined
+    let timer = 0
+    const onScroll = () => {
+      setScrolling(true)
+      clearTimeout(timer)
+      timer = setTimeout(() => setScrolling(false), KEY_RESUME_MS)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [])
+
   return (
     <section className="relative mx-auto flex min-h-svh max-w-[1512px] flex-col items-center justify-center px-page pb-12 pt-[78px] lg:block lg:h-[594px] lg:min-h-0 lg:pb-0 lg:pt-[175px]">
       {/* The key is lit for black: inverting it and multiplying drops the black and keeps its colours. */}
       <div className="mx-auto size-[min(64vw,274px)] mix-blend-multiply lg:size-[clamp(180px,18.1vw,274px)] invert hue-rotate-180 lg:translate-x-0.5">
-        <GlassKeyboard />
+        <GlassKeyboard speed={scrolling ? 0 : 50} />
       </div>
       <div className="mt-8 flex justify-center lg:absolute lg:right-[78px] lg:top-[508px] lg:mt-0">
         <ArrowLink href="https://studione.world">(Building Studione )</ArrowLink>
@@ -192,6 +212,8 @@ const focusBounds = (key, left, widths) => {
   return (left[start] + left[end] + widths[end]) / 2
 }
 
+const philosophyHeight = () => document.querySelector('[data-philosophy]')?.closest('section')?.offsetHeight ?? 0
+
 function Focus() {
   const section = useRef(null)
   const reduced = prefersReducedMotion()
@@ -343,7 +365,7 @@ function Focus() {
           .timeline({
             defaults: { ease: 'none' },
             onUpdate: render,
-            scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom 200%', scrub: 0.3, onRefresh: measure },
+            scrollTrigger: { trigger: section.current, start: 'top top', end: () => `bottom ${window.innerHeight + philosophyHeight()}px`, scrub: 0.3, invalidateOnRefresh: true, onRefresh: measure },
           })
           .to(state, { open: 1, duration: 0.4 }, 0)
           .to(state, { head: last + FOCUS_HEAD_LEAD, duration: 5 }, 0)
@@ -359,7 +381,7 @@ function Focus() {
   )
 
   return (
-    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[320svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
+    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[260svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
       <div data-focus-frame className="absolute inset-x-0 bottom-0 top-0 bg-night" />
       {reduced ? (
         <h2 className="relative w-full max-w-[777px] text-center text-display font-medium leading-[1.28] tracking-[-0.006em]">{FOCUS_SENTENCE}</h2>
@@ -417,14 +439,29 @@ function Philosophy() {
         gsap.fromTo('[data-philosophy-image]', { clipPath: 'inset(0 50%)' }, { clipPath: 'inset(0 0%)', ...OPEN_IMAGE, scrollTrigger })
       })
 
+      media.add('(max-width: 767.98px)', () => {
+        const section = scope.current
+        const overlap = () => {
+          section.style.marginTop = `${-section.offsetHeight}px`
+          ScrollTrigger.refresh()
+        }
+        const watcher = new ResizeObserver(overlap)
+        watcher.observe(section)
+
+        return () => {
+          watcher.disconnect()
+          section.style.marginTop = ''
+        }
+      })
+
       return () => media.revert()
     },
     { scope },
   )
 
   return (
-    <section ref={scope} className="flex justify-center px-page py-24 max-md:relative max-md:z-30 max-md:min-h-svh max-md:items-center max-md:bg-page max-md:motion-safe:-mt-[100svh] lg:h-[633px] lg:py-0 lg:pt-[201px]">
-      <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-h2 md:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
+    <section ref={scope} className="flex justify-center px-4 py-[104px] max-md:relative max-md:z-30 max-md:bg-page md:px-page md:py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
+      <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[20px] md:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
         Everything I make starts with{' '}
         <br className="max-sm:hidden" />
         <span className="relative whitespace-pre font-script">
@@ -449,35 +486,15 @@ function LogoBox({ box, children }) {
   )
 }
 
-const MARQUEE_SPEED = 56
-const MARQUEE_COPIES = [0, 1, 2, 3]
-
-function PartnerMarquee() {
-  const track = useRef(null)
-
-  useGSAP(() => {
-    if (prefersReducedMotion()) return
-
-    gsap.to(track.current, {
-      xPercent: -50,
-      duration: track.current.scrollWidth / 2 / MARQUEE_SPEED,
-      ease: 'none',
-      repeat: -1,
-      scrollTrigger: { trigger: track.current, start: 'top bottom', end: 'bottom top', toggleActions: 'play pause resume pause' },
-    })
-  })
-
+// Every logo keeps its file proportions and scales by the same amount, so they read as one set.
+function LogoRow({ logos }) {
   return (
-    <div className="-mx-page overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-      <div ref={track} className="flex w-max items-center">
-        {MARQUEE_COPIES.flatMap((copy) =>
-          partnerLogos.map(({ src, alt, width, box }) => (
-            <div key={`${copy}-${alt}`} className="shrink-0 pr-8 lg:pr-10" aria-hidden={copy > 0}>
-              <LogoBox box={box}><img src={src} alt={copy > 0 ? '' : alt} width={width} className="max-lg:h-4 max-lg:w-auto lg:max-w-none" /></LogoBox>
-            </div>
-          )),
-        )}
-      </div>
+    <div className="mx-auto flex max-w-[1206px] flex-wrap items-center justify-center gap-x-8 opacity-60 lg:flex-nowrap lg:gap-x-10">
+      {logos.map(({ src, alt, height, box }) => (
+        <LogoBox key={alt} box={box}>
+          <img src={src} alt={alt} style={{ '--logo-h': `${height}px` }} className="h-[calc(var(--logo-h)*0.7)] w-auto max-w-none lg:h-(--logo-h)" />
+        </LogoBox>
+      ))}
     </div>
   )
 }
@@ -487,145 +504,27 @@ function Collaboration() {
     <section className="bg-void px-page py-20 text-white lg:h-[554px] lg:py-0 lg:pt-[104px]">
       <div data-reveal className="flex justify-center">
         {[1, 2, 3, 4].map((n) => (
-          <img loading="lazy" decoding="async" key={n} src={`${P}/avatar-${n}.webp`} alt="" width="59" height="59" className="-ml-2 size-[58.69px] first:ml-0" />
+          <img loading="lazy" decoding="async" key={n} src={`${P}/avatar-${n}.webp`} alt="" width="59" height="59" className="-ml-1.5 size-11 first:ml-0 md:-ml-2 md:size-[58.69px]" />
         ))}
       </div>
       <p data-reveal className="mx-auto mt-[35px] max-w-[413px] text-center text-body-lg tracking-[-0.01em]">
         Teams I’ve worked with
       </p>
       <div data-reveal className="mt-10 lg:mt-[96px]">
-        <PartnerMarquee />
+        <LogoRow logos={partnerLogos} />
       </div>
     </section>
   )
 }
 
-const GLASS_EDGE = 'absolute inset-0 rounded-[inherit] shadow-[inset_0_0_4px_-1px_rgba(255,255,255,0.25)]'
-
-function Pointer({ src, left, top, transform }) {
-  return (
-    <div className="absolute flex h-[27.115px] w-[27.81px] items-center justify-center" style={{ left, top }}>
-      <div className="relative h-[18.303px] w-[21.134px]" style={{ transform }}>
-        <img src={src} alt="" className="absolute left-[9.67%] top-[5%] block h-[83.01%] w-[80.66%] max-w-none" />
-      </div>
-    </div>
-  )
-}
-
-function RoleLabel({ left, top, width, bg, color, children }) {
-  return (
-    <div className="absolute flex h-[24.719px] items-center justify-center whitespace-nowrap rounded-[18.681px] p-[7.784px] text-[7.914px] font-medium leading-[1.2] tracking-[0.0791px] max-sm:h-8 max-sm:!w-auto max-sm:text-[16px]" style={{ left, top, width, backgroundColor: bg, color }}>
-      {children}
-    </div>
-  )
-}
-
-function Pop({ origin, children }) {
-  return (
-    <div data-pop className="absolute inset-0" style={{ transformOrigin: origin }}>
-      {children}
-    </div>
-  )
-}
-
-function CommunityIllustration() {
-  const scope = useRef(null)
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return
-
-      const [star, avatar, writer, designer, photo, social, glass] = gsap.utils.toArray('[data-pop]')
-      const pop = { autoAlpha: 0, scale: 0.5, rotation: -12, duration: 0.55, ease: 'back.out(2)' }
-
-      gsap
-        .timeline({ scrollTrigger: { trigger: scope.current, start: 'top 80%', once: true } })
-        .from('[data-glow]', { autoAlpha: 0, scale: 0.2, duration: 1, ease: 'power2.out' }, 0)
-        .from('[data-pill]', { autoAlpha: 0, scale: 0.3, duration: 0.5, ease: 'back.out(1.4)' }, 0.05)
-        .from('[data-pill-text]', { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, 0.35)
-        .from(star, pop, 0.25)
-        .from(avatar, pop, 0.45)
-        .from(writer, pop, 0.65)
-        .from(designer, pop, 0.8)
-        .from(photo, pop, 0.95)
-        .from(social, pop, 1.15)
-        .from(glass, pop, 1.3)
-    },
-    { scope },
-  )
-
-  return (
-    <div ref={scope} className="font-inter">
-      <ScaledStage width={440} height={293}>
-        <div data-glow className="absolute left-[209px] top-[118px] size-[57px]">
-          <img src={`${P}/ill-glow.svg`} alt="" className="absolute left-[-167.72%] top-[-167.72%] block size-[435.44%] max-w-none" />
-        </div>
-        <Pop origin="387.5px 94.5px">
-          <img loading="lazy" decoding="async" src={`${P}/ill-avatar.webp`} alt="" width="55" height="55" className="absolute left-[360px] top-[67px] block size-[55px] max-w-none" />
-        </Pop>
-        <Pop origin="393.5px 192.5px">
-          <div className="absolute left-[347px] top-[146px] flex size-[93.154px] items-center justify-center">
-            <div className="relative size-[83px] rotate-[7.52deg]">
-              <img loading="lazy" decoding="async" src={`${P}/ill-star.webp`} alt="" className="absolute left-[13.51%] top-[12.14%] block h-[70.35%] w-[72.98%] max-w-none" />
-            </div>
-          </div>
-        </Pop>
-        <div data-pill className="absolute inset-0" style={{ transformOrigin: '233px 146.5px' }}>
-          <div className="absolute left-[140px] top-[122px] h-[49px] w-[186px] rounded-[21px] bg-[rgba(217,217,217,0.24)] backdrop-blur-[11.4px] max-sm:left-[115px] max-sm:w-[222px]">
-            <div className={GLASS_EDGE} />
-          </div>
-          <img loading="lazy" decoding="async" src={`${P}/ill-thumb.webp`} alt="" className="absolute left-[150px] top-[132px] size-[30px] max-w-none rounded-[12px] object-cover max-sm:left-[124px]" />
-          <div data-pill-text>
-            <p className="absolute left-[186px] top-[134px] whitespace-nowrap text-[8px] leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:left-[160px] max-sm:top-[136px] max-sm:text-[17px] max-sm:font-medium">Community Led Events</p>
-            <p className="absolute left-[186px] top-[147px] whitespace-nowrap text-[8px] font-medium leading-[1.2] tracking-[0.08px] text-[#f2f2f2] max-sm:hidden">Engaging Community Gatherings</p>
-          </div>
-        </div>
-        <Pop origin="120px 226px">
-          <Pointer src={`${P}/pointer-1.svg`} left={142.05} top={194} transform="rotate(35deg)" />
-          <RoleLabel left={86} top={214.01} width={67.73} bg="#ffffff" color="#0a0a0a">Content Writer</RoleLabel>
-        </Pop>
-        <Pop origin="302px 207px">
-          <Pointer src={`${P}/pointer-2.svg`} left={261.03} top={174.49} transform="rotate(145deg) scaleY(-1)" />
-          <RoleLabel left={278.41} top={194.51} width={47.597} bg="#fafd86" color="#3b3c01">Designer</RoleLabel>
-        </Pop>
-        <Pop origin="58.5px 163.5px">
-          <div className="absolute left-[26.08px] top-[130.86px] flex size-[64.931px] items-center justify-center">
-            <div className="relative size-[52px] rotate-17 rounded-[11px]">
-              <img loading="lazy" decoding="async" src={`${P}/ill-rounded.webp`} alt="" className="absolute inset-0 size-full max-w-none rounded-[11px] object-cover" />
-              <div className={GLASS_EDGE} />
-            </div>
-          </div>
-        </Pop>
-        <Pop origin="154px 80px">
-          <Pointer src={`${P}/pointer-3.svg`} left={176} top={85.62} transform="rotate(-35deg) scaleY(-1)" />
-          <RoleLabel left={120.52} top={68} width={67.73} bg="#78fda5" color="#013c15">Social Director</RoleLabel>
-        </Pop>
-        <Pop origin="47.5px 122.5px">
-          <div className="absolute left-[16.66px] top-[92.88px] flex h-[59.342px] w-[61.571px] items-center justify-center">
-            <div className="relative h-[49.042px] w-[52px] rotate-[-12.8deg] rounded-[11px] bg-[rgba(86,86,86,0.33)] backdrop-blur-[3.65px]">
-              <div className={GLASS_EDGE} />
-            </div>
-          </div>
-        </Pop>
-      </ScaledStage>
-    </div>
-  )
-}
-
 function Community() {
   return (
-    <section className="overflow-hidden bg-void px-page pb-20 pt-16 text-white lg:h-[1467px] lg:pb-0 lg:pt-[84px]">
-      <div className="mx-auto max-w-[300px] sm:max-w-[440px] lg:-translate-x-[17px]">
-        <CommunityIllustration />
-      </div>
-      <h2 data-reveal className="mx-auto mt-16 max-w-[413px] text-center text-h3 leading-[1.2] md:mt-[80px] md:text-h2">
+    <section className="overflow-hidden bg-void px-page pb-20 pt-16 text-white lg:pb-[209px] lg:pt-[104px]">
+      <h2 data-reveal className="mx-auto max-w-[413px] text-center text-base leading-[1.2] md:text-h2">
         Communities I’ve built with
       </h2>
-      <div data-reveal className="mx-auto mt-16 flex max-w-[1206px] flex-wrap items-center justify-center gap-x-8 opacity-60 lg:mt-[120px] lg:flex-nowrap lg:gap-x-10">
-        {communityLogos.map(({ src, alt, box }) => (
-          <LogoBox key={alt} box={box}><img src={src} alt={alt} className="max-lg:h-6 max-lg:w-auto" /></LogoBox>
-        ))}
-        <LogoBox box={217}><img src={`${P}/logo-updates.svg`} alt="Updates" width="217" height="100" className="max-lg:h-[46px] max-lg:w-auto lg:max-w-none" /></LogoBox>
+      <div data-reveal className="mt-16 lg:mt-[120px]">
+        <LogoRow logos={[...communityLogos, { src: `${P}/logo-updates.svg`, alt: 'Updates', height: 100, box: 217 }]} />
       </div>
       <div data-reveal className="mx-auto mt-16 max-w-[927px] lg:mt-[149px]">
         <div className="no-scrollbar -mx-page overflow-x-auto px-page md:mx-0 md:overflow-visible md:px-0">

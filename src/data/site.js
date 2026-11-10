@@ -70,27 +70,27 @@ const draftTestimonials = import.meta.env.DEV
 export const testimonials = [...approvedTestimonials, ...draftTestimonials]
 
 export const works = [
-  { name: 'Placeam' },
-  { name: 'Fleetkit', to: '/work/fleetkit' },
+  { name: 'Placeam', tags: 'digital, fashion, shopping' },
+  { name: 'Fleetkit', to: '/work/fleetkit', tags: 'digital, commercial, shopping' },
   { name: 'Acemyx', tags: 'identity, digital, education' },
-  { name: 'Placeam AI Studio' },
-  { name: 'Voomies' },
-  { name: 'Campusx' },
+  { name: 'Placeam AI Studio', tags: 'digital, fashion, ai' },
+  { name: 'Voomies', tags: 'digital, commercial, shopping' },
+  { name: 'Campusx', tags: 'digital, food & drink, shopping' },
 ]
 
 export const partnerLogos = [
-  { src: '/images/profile/logo-acemyx.svg', alt: 'Acemyx', width: 117, box: 204 },
-  { src: '/images/profile/logo-campusx.svg', alt: 'CampusX', width: 138, box: 204 },
-  { src: '/images/profile/logo-fleetkit.svg', alt: 'Fleetkit', width: 108, box: 204 },
-  { src: '/images/profile/logo-looprail.svg', alt: 'Looprail', width: 217, box: 217 },
-  { src: '/images/profile/logo-studione.svg', alt: 'Studione', width: 111, box: 217 },
+  { src: '/images/profile/logo-acemyx.svg', alt: 'Acemyx', height: 29.84, box: 204 },
+  { src: '/images/profile/logo-campusx.svg', alt: 'CampusX', height: 29.8, box: 204 },
+  { src: '/images/profile/logo-fleetkit.svg', alt: 'Fleetkit', height: 22.16, box: 204 },
+  { src: '/images/profile/logo-looprail.svg', alt: 'Looprail', height: 100, box: 217 },
+  { src: '/images/profile/logo-studione.svg', alt: 'Studione', height: 22, box: 217 },
 ]
 
 export const communityLogos = [
-  { src: '/images/profile/logo-gdgoc.svg', alt: 'GDGoC', box: 204 },
-  { src: '/images/profile/logo-nacoss.svg', alt: 'NACOSS', box: 204 },
-  { src: '/images/profile/logo-cowrywise.svg', alt: 'Cowrywise', box: 204 },
-  { src: '/images/profile/logo-kwarabuild.svg', alt: 'KwaraBuild', box: 217 },
+  { src: '/images/profile/logo-gdgoc.svg', alt: 'GDGoC', height: 34.1, box: 204 },
+  { src: '/images/profile/logo-nacoss.svg', alt: 'NACOSS', height: 35.14, box: 204 },
+  { src: '/images/profile/logo-cowrywise.svg', alt: 'Cowrywise', height: 35.14, box: 204 },
+  { src: '/images/profile/logo-kwarabuild.svg', alt: 'KwaraBuild', height: 34.1, box: 217 },
 ]
 
 export const eventCards = [
