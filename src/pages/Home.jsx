@@ -240,13 +240,15 @@ function WorkCard({ name, cta, to }) {
   return (
     <article className="group/card flex w-[min(84vw,541px)] shrink-0 flex-col items-center gap-6 lg:w-[541px]">
       {to ? <Link to={to} aria-label={`${name} case study`} className="block w-full">{image}</Link> : image}
-      <div className="flex w-full items-center justify-between gap-4 px-4 max-md:*:text-[14px] lg:w-[461px] lg:px-0">
+      <div className="flex w-full items-center justify-between gap-4 px-4 max-md:*:text-[14px] md:*:text-[18px] lg:w-[461px] lg:px-0">
         <h3 className="text-base-lg font-medium uppercase leading-6 text-ink">{name}</h3>
         <ArrowLink to={to}>{cta}</ArrowLink>
       </div>
     </article>
   )
 }
+
+const WHEEL_SETTLE_MS = 200
 
 function SelectedWorks() {
   const track = useRef(null)
@@ -279,7 +281,29 @@ function SelectedWorks() {
         },
       })
 
-      return () => draggable.kill()
+      // Trackpad sideways swipes and Shift + wheel move the row too; a plain wheel still scrolls the page.
+      let target = 0
+      let lastWheel = 0
+      const moveTo = gsap.quickTo(track.current, 'x', { duration: 0.5, ease: 'power3.out', onUpdate: () => draggable.update() })
+      const onWheel = (event) => {
+        const sideways = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.shiftKey ? event.deltaY : 0
+        if (!sideways) return
+        event.preventDefault()
+        event.stopPropagation()
+        const now = performance.now()
+        if (now - lastWheel > WHEEL_SETTLE_MS) target = Number(gsap.getProperty(track.current, 'x'))
+        lastWheel = now
+        const { minX } = getBounds()
+        target = gsap.utils.clamp(minX, 0, target - sideways)
+        moveTo(target)
+      }
+      const row = track.current.parentElement
+      row.addEventListener('wheel', onWheel, { passive: false })
+
+      return () => {
+        row.removeEventListener('wheel', onWheel)
+        draggable.kill()
+      }
     })
 
     return () => media.revert()

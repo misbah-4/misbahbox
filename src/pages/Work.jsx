@@ -14,7 +14,7 @@ function Work() {
         {works.map(({ name, tags, to }) => (
           <article key={name} data-reveal className="flex flex-col gap-6">
             {to ? <Link to={to} aria-label={`${name} case study`} className="block aspect-[461/307] w-full bg-stone" /> : <div className="aspect-[461/307] w-full bg-stone" />}
-            <div className="flex flex-col gap-2 text-base-lg uppercase leading-6 tracking-[0.02em] max-md:text-[14px] max-md:leading-5">
+            <div className="flex flex-col gap-2 md:gap-1 text-base-lg uppercase leading-6 tracking-[0.02em] max-md:text-[14px] max-md:leading-5 md:text-[18px]">
               <h2 className="font-medium text-ink">{name}</h2>
               {tags && <p className="text-muted">{tags}</p>}
             </div>

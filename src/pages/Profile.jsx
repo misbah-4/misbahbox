@@ -796,7 +796,7 @@ function Hobbies() {
 
   return (
     <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] items-center justify-center px-page">
-      <p data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,5.25rem)] leading-[1.28] tracking-[-0.03em]">
+      <p data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,3rem)] leading-[1.28] tracking-[-0.03em]">
         <span className="sr-only">{HOBBY_SENTENCE}</span>
         {HOBBY_LINES.map(({ text: line, tone }, lineIndex) => {
           const before = HOBBY_LINES.slice(0, lineIndex).reduce((count, { text: earlier }) => count + earlier.split(' ').length, 0)
