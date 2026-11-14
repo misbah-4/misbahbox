@@ -1,5 +1,13 @@
 import { Link } from 'react-router-dom'
+import { projects } from '../data/projects.js'
 import { works } from '../data/site.js'
+
+const firstCaseStudyImage = (to) => projects[to?.split('/').pop()]?.sections.find(({ image }) => image)?.image.src
+
+// The card link already carries the project name, so the picture itself is decorative.
+function Thumbnail({ src }) {
+  return src ? <img src={src} alt="" loading="lazy" decoding="async" className="size-full object-cover" /> : null
+}
 
 function Work() {
   return (
@@ -14,9 +22,15 @@ function Work() {
         <p className="text-base-lg leading-6 text-muted">(Case Studies)</p>
       </div>
       <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-y-16">
-        {works.map(({ name, tags, to }) => (
+        {works.map(({ name, tags, to, thumb }) => (
           <article key={name} data-reveal className="flex flex-col gap-6">
-            {to ? <Link to={to} aria-label={`${name} case study`} className="block aspect-[461/307] w-full bg-stone" /> : <div className="aspect-[461/307] w-full bg-stone" />}
+            {to ? (
+              <Link to={to} aria-label={`${name} case study`} className="block aspect-[461/307] w-full overflow-hidden bg-stone">
+                <Thumbnail src={thumb ?? firstCaseStudyImage(to)} />
+              </Link>
+            ) : (
+              <div className="aspect-[461/307] w-full bg-stone" />
+            )}
             <div className="flex flex-col gap-2 md:gap-1 text-base-lg uppercase leading-6 tracking-[0.02em] max-md:text-[14px] max-md:leading-5 md:text-[18px]">
               <h2 className="font-medium text-ink">{name}</h2>
               {tags && <p className="text-muted">{tags}</p>}

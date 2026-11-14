@@ -2,44 +2,28 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ArrowLink from '../components/ArrowLink.jsx'
 import ScaledStage from '../components/ScaledStage.jsx'
+import Greeting, { GREETING_WIDTH, greetingTimeline } from '../components/Greeting.jsx'
+import Skater, { PUSH, SKATER_FRAMES, SKATER_RATIO } from '../components/Skater.jsx'
 import { moodboardLabel, selectedWorks, sideProjects, testimonials } from '../data/site.js'
 import { Draggable, gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from '../lib/motion.js'
+import { armSkateSound, playPush, setRolling } from '../lib/skateSound.js'
 
-const SHOWCASE = [
-  { left: 0, top: 44, w: 110.469, h: 93.753, depth: 18, layers: [{ src: 'card-1' }], dark: true },
-  { left: 459, top: 123.55, w: 115.556, h: 118.463, depth: 34, layers: [{ src: 'card-2' }] },
-  { left: 54.93, top: 156.98, w: 219.485, h: 125.004, depth: 12, layers: [{ src: 'card-3' }], dark: true },
-  { left: 222.81, top: 28.34, w: 103.928, h: 59.191, depth: 26, layers: [{ src: 'card-4' }], dark: true },
-  { left: 304.21, top: 0, w: 125.004, h: 173.698, depth: 40, layers: [{ src: 'card-5', style: { left: '-4.1%', top: 0, width: '146.78%', height: '100%', maxWidth: 'none' } }] },
-  {
-    left: 164.67,
-    top: 205.68,
-    w: 162.07,
-    h: 131.5,
-    depth: 22,
-    dark: true,
-    layers: [
-      { src: 'card-1' },
-      { src: 'card-6', style: { left: '-13.5%', top: '-2.16%', width: '117.52%', height: '117.52%', maxWidth: 'none' } },
-    ],
-  },
-]
-
-// Each card crosses the stage in this many seconds, on the front half of an orbit.
-const CROSSING = 2.4
-const ORBIT_RADIUS = 430
 const PHONE_STAGE_SCALE = 0.78
 const ORBIT_EDGE_MARGIN = 70
+const ORBIT_RADIUS = 430
 const STAGE = { width: 575, height: 337 }
 
-const centerY = ({ top, h }) => top + h / 2 - STAGE.height / 2
+// The green guy rolls in from the right, pushes twice in the middle, then rolls out left.
+// Sized so the drawing (238 of each frame's 248px) stands 150px tall, the same as "Hello".
+const SKATER = { width: 199, enter: 1, hold: PUSH * 2, exit: 0.9 }
+const SKATE_DURATION = SKATER.enter + SKATER.hold + SKATER.exit
+// In the reference his foot meets the ground on frame 2 of each push.
+const PUSH_FRAME = 2
 
-const STREAM = [
-  ...SHOWCASE.map((card) => ({ ...card, y: centerY(card) })),
-  ...[3, 0, 4, 1, 5, 2].map((index) => ({ ...SHOWCASE[index], y: -centerY(SHOWCASE[index]) })),
-]
+// Once he is gone, "Hello" unfolds and plays. Then the deck cuts through these, and he rolls back in.
+// On phones the greeting shrinks to keep the 16px page gutter.
+const GREETING_SIZE = 150
 
-// After the stream empties, the deck cuts through these, then the stream returns.
 const DECK = { width: 206, height: 300, beat: 0.55, enter: 0.3, exit: 0.25 }
 const DECK_CARDS = [
   { src: 'card-5', rotate: -1.5 },
@@ -49,9 +33,8 @@ const DECK_CARDS = [
   { src: 'card-4', rotate: -1.2 },
   { src: 'card-1', rotate: 0.9 },
 ]
-const STREAM_DURATION = CROSSING * (1 + (STREAM.length - 1) / STREAM.length)
 const DECK_DURATION = DECK.beat * DECK_CARDS.length
-const CYCLE_DURATION = STREAM_DURATION + DECK_DURATION
+const CYCLE_DURATION = SKATE_DURATION + DECK_DURATION // the greeting's length is added once it is built
 
 // Words sit across the deck's edges: dark on the page, white where they cross the images.
 function DeckLabel({ className }) {
@@ -68,16 +51,21 @@ function DeckLabel({ className }) {
 function Showcase() {
   const scope = useRef(null)
   const [reduced] = useState(prefersReducedMotion)
-  const slots = reduced ? SHOWCASE : STREAM
 
   useGSAP(
     () => {
       if (reduced) return undefined
 
-      const cards = gsap.utils.toArray('[data-card]')
+      const skater = scope.current.querySelector('[data-skater]')
+      const strip = scope.current.querySelector('[data-skater-strip]')
+      const disarm = armSkateSound()
+      let lastFrame = -1
       const deck = scope.current.querySelector('[data-deck]')
       const deckCards = gsap.utils.toArray('[data-deck-card]')
-      // On phones the cards enter just past the screen edge instead of far outside it.
+      const greeting = greetingTimeline(scope.current.querySelector('[data-greeting]'))
+      const greetingEnd = SKATE_DURATION + greeting.duration()
+      const cycle = CYCLE_DURATION + greeting.duration()
+      // On phones the skater enters just past the screen edge instead of far outside it.
       const orbit = Math.min(ORBIT_RADIUS, (window.innerWidth / 2 + ORBIT_EDGE_MARGIN) / PHONE_STAGE_SCALE)
       let elapsed = 0
       let active = true
@@ -92,10 +80,14 @@ function Showcase() {
       })
 
       const tick = (_time, deltaTime) => {
-        if (!active) return
+        if (!active) {
+          setRolling(0)
+          return
+        }
         elapsed += deltaTime / 1000
-        const time = elapsed % CYCLE_DURATION
-        const deckTime = time - STREAM_DURATION
+        const time = elapsed % cycle
+        const deckTime = time - greetingEnd
+        greeting.time(gsap.utils.clamp(0, greeting.duration(), time - SKATE_DURATION))
 
         if (deckTime >= 0) {
           const current = Math.min(Math.floor(deckTime / DECK.beat), deckCards.length - 1)
@@ -113,27 +105,35 @@ function Showcase() {
           deck.style.visibility = 'hidden'
         }
 
-        cards.forEach((card, index) => {
-          const travelled = time / CROSSING - index / cards.length
-          if (travelled < 0 || travelled >= 1) {
-            card.style.visibility = 'hidden'
-            return
-          }
+        if (time >= SKATE_DURATION) {
+          skater.style.visibility = 'hidden'
+          setRolling(0)
+          lastFrame = -1
+          return
+        }
 
-          const angle = travelled * Math.PI
-          const scale = Math.sin(angle) ** 1.4
-          const x = Math.cos(angle) * orbit
-          const y = Number(card.dataset.y) * scale
-
-          card.style.visibility = 'visible'
-          card.style.zIndex = Math.round(scale * 100)
-          card.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
-        })
+        // One frame every 100ms, and a kick sound the moment his foot lands.
+        const frame = Math.floor((time % PUSH) / (PUSH / SKATER_FRAMES))
+        if (frame !== lastFrame) {
+          strip.style.transform = `translate3d(${(-100 * frame) / SKATER_FRAMES}%, 0, 0)`
+          if (frame === PUSH_FRAME) playPush()
+          lastFrame = frame
+        }
+        const rollOut = time - SKATER.enter - SKATER.hold
+        let x = 0
+        if (time < SKATER.enter) x = orbit * (1 - gsap.parseEase('power2.out')(time / SKATER.enter))
+        else if (rollOut > 0) x = -orbit * gsap.parseEase('power2.in')(rollOut / SKATER.exit)
+        skater.style.visibility = 'visible'
+        skater.style.transform = `translate3d(${x}px, 0, 0)`
+        // The rumble grows as he rolls on screen and fades as he leaves.
+        setRolling(1 - Math.min(1, Math.abs(x) / orbit) * 0.8)
       }
 
       gsap.ticker.add(tick)
       return () => {
         gsap.ticker.remove(tick)
+        disarm()
+        greeting.kill()
         trigger.kill()
       }
     },
@@ -143,29 +143,21 @@ function Showcase() {
   return (
     <div ref={scope} className="overflow-x-clip px-page pt-[102px]">
       <ScaledStage width={STAGE.width} height={STAGE.height} minScale={PHONE_STAGE_SCALE}>
-        {slots.map(({ left, top, w, h, y, layers, dark }, index) => (
+        <div
+          data-skater
+          className="absolute left-1/2 top-1/2 text-ink will-change-transform"
+          style={{ width: SKATER.width, marginLeft: -SKATER.width / 2, marginTop: (-SKATER.width * SKATER_RATIO) / 2, visibility: reduced ? 'visible' : 'hidden' }}
+        >
+          <Skater className="block w-full" />
+        </div>
+        {!reduced && (
           <div
-            key={index}
-            data-card
-            data-y={y}
-            className={`absolute overflow-hidden rounded-[1px] ${dark ? 'bg-[#141414]' : ''}`}
-            style={
-              reduced
-                ? { left, top, width: w, height: h }
-                : { left: '50%', top: '50%', width: w, height: h, marginLeft: -w / 2, marginTop: -h / 2, visibility: 'hidden', willChange: 'transform' }
-            }
+            className="absolute top-1/2 -translate-y-1/2"
+            style={{ fontSize: `min(${GREETING_SIZE}px, calc((100vw - 32px) / ${PHONE_STAGE_SCALE * GREETING_WIDTH}))`, left: `calc(50% - ${GREETING_WIDTH / 2}em)` }}
           >
-            {layers.map(({ src, style }) => (
-              <img
-                key={src}
-                src={`/images/home/${src}.webp`}
-                alt=""
-                className={`absolute ${style ? '' : 'inset-0 size-full object-cover'}`}
-                style={style}
-              />
-            ))}
+            <Greeting className="invisible" />
           </div>
-        ))}
+        )}
         {!reduced && (
           <div
             data-deck

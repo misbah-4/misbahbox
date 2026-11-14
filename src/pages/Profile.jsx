@@ -1,39 +1,72 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useRef } from 'react'
 import ArrowLink from '../components/ArrowLink.jsx'
 import MeshImage from '../components/MeshImage.jsx'
-import GlassKeyboard from '../components/originkit/ui/single-glass-keyboard-custom-style.tsx'
 import ScaledStage from '../components/ScaledStage.jsx'
 import { communityLogos, eventCards, partnerLogos } from '../data/site.js'
 import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from '../lib/motion.js'
 
 const P = '/images/profile'
 
-const KEY_RESUME_MS = 180
+const KEY_SRC = `${P}/hero-key.webp`
+// The same three motions as the glass key it replaces: a slow drift, a light sweep and a press.
+const KEY_DRIFT = 4.8
+const KEY_SWEEP_EVERY = 3.6
+const KEY_PRESS_EVERY = 3.2
 
 function Hero() {
-  const [scrolling, setScrolling] = useState(false)
+  const scope = useRef(null)
 
-  // The key redraws every frame; on phones that competes with scrolling, so it rests until the page stops.
-  useEffect(() => {
-    if (!window.matchMedia('(pointer: coarse)').matches) return undefined
-    let timer = 0
-    const onScroll = () => {
-      setScrolling(true)
-      clearTimeout(timer)
-      timer = setTimeout(() => setScrolling(false), KEY_RESUME_MS)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [])
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return undefined
+      const key = scope.current.querySelector('[data-key]')
+      const press = scope.current.querySelector('[data-key-press]')
+      const sweep = scope.current.querySelector('[data-key-sweep]')
+
+      const drift = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: 'sine.inOut' } })
+        .fromTo(key, { y: -5, rotation: -1.5 }, { y: 5, rotation: 1.5, duration: KEY_DRIFT })
+      const shine = gsap.timeline({ repeat: -1 })
+        .fromTo(sweep, { backgroundPosition: '130% 0' }, { backgroundPosition: '-30% 0', duration: 1.4, ease: 'power2.inOut' })
+        .set({}, {}, KEY_SWEEP_EVERY)
+      const tap = gsap.timeline({ repeat: -1, delay: 1.2 })
+        .to(press, { y: 6, scaleY: 0.965, duration: 0.12, ease: 'power2.in' })
+        .to(press, { y: 0, scaleY: 1, duration: 0.45, ease: 'back.out(3)' })
+        .set({}, {}, KEY_PRESS_EVERY)
+
+      // Rest while the hero is off screen.
+      const visible = ScrollTrigger.create({
+        trigger: scope.current,
+        start: 'top bottom',
+        end: 'bottom top',
+        onToggle: (self) => [drift, shine, tap].forEach((motion) => motion.paused(!self.isActive)),
+      })
+      return () => visible.kill()
+    },
+    { scope },
+  )
 
   return (
-    <section className="relative mx-auto flex min-h-svh max-w-[1512px] flex-col items-center justify-center px-page pb-12 pt-[78px] lg:block lg:h-[594px] lg:min-h-0 lg:pb-0 lg:pt-[175px]">
-      {/* The key is lit for black: inverting it and multiplying drops the black and keeps its colours. */}
-      <div className="mx-auto size-[min(64vw,274px)] mix-blend-multiply lg:size-[clamp(180px,18.1vw,274px)] invert hue-rotate-180 lg:translate-x-0.5">
-        <GlassKeyboard speed={scrolling ? 0 : 50} />
+    <section ref={scope} className="relative mx-auto flex min-h-svh max-w-[1512px] flex-col items-center justify-center px-page pb-12 pt-[78px] lg:block lg:h-[594px] lg:min-h-0 lg:pb-0 lg:pt-[175px]">
+      <div data-key className="relative mx-auto size-[min(64vw,274px)] will-change-transform lg:size-[clamp(180px,18.1vw,274px)] lg:translate-x-0.5">
+        <div data-key-press className="relative size-full origin-bottom">
+          <img src={KEY_SRC} alt="Keyboard key" width="277" height="278" className="block size-full" />
+          {/* The light band only shows on the key itself, with a faint colour split at its edges like the glass had. */}
+          <div
+            data-key-sweep
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 mix-blend-screen"
+            style={{
+              maskImage: `url(${KEY_SRC})`,
+              WebkitMaskImage: `url(${KEY_SRC})`,
+              maskSize: '100% 100%',
+              WebkitMaskSize: '100% 100%',
+              backgroundImage:
+                'linear-gradient(105deg, transparent 38%, rgba(80,160,255,0.18) 44%, rgba(255,255,255,0.42) 50%, rgba(255,120,200,0.18) 56%, transparent 62%)',
+              backgroundSize: '250% 100%',
+              backgroundPosition: '130% 0',
+            }}
+          />
+        </div>
       </div>
       <div className="mt-8 flex justify-center lg:absolute lg:right-[78px] lg:top-[508px] lg:mt-0">
         <ArrowLink href="https://studione.world">(Building Studione )</ArrowLink>
@@ -42,15 +75,8 @@ function Hero() {
   )
 }
 
-// The last image is the card's resting state.
-const INTRO_IMAGES = [
-  '/images/atelier/brand-os.webp',
-  '/images/atelier/shoes.webp',
-  '/images/atelier/phone-orange.webp',
-  '/images/atelier/phone-blue.webp',
-  '/images/home/fleetkit.webp',
-  `${P}/intro-card.webp`,
-]
+// The cards from Figma's Profile Intro Images, in order. The last image is the card's resting state: the portrait.
+const INTRO_IMAGES = [2, 3, 4, 5, 1].map((n) => `${P}/intro-${n}.webp`)
 const INTRO_GROW = 1.1
 const INTRO_FLIP_BEAT = 0.35
 const INTRO_TEXT_GAP = 12
@@ -212,8 +238,6 @@ const focusBounds = (key, left, widths) => {
   return (left[start] + left[end] + widths[end]) / 2
 }
 
-const philosophyHeight = () => document.querySelector('[data-philosophy]')?.closest('section')?.offsetHeight ?? 0
-
 function Focus() {
   const section = useRef(null)
   const reduced = prefersReducedMotion()
@@ -365,7 +389,7 @@ function Focus() {
           .timeline({
             defaults: { ease: 'none' },
             onUpdate: render,
-            scrollTrigger: { trigger: section.current, start: 'top top', end: () => `bottom ${window.innerHeight + philosophyHeight()}px`, scrub: 0.3, invalidateOnRefresh: true, onRefresh: measure },
+            scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom 200%', scrub: 0.3, invalidateOnRefresh: true, onRefresh: measure },
           })
           .to(state, { open: 1, duration: 0.4 }, 0)
           .to(state, { head: last + FOCUS_HEAD_LEAD, duration: 5 }, 0)
@@ -381,13 +405,13 @@ function Focus() {
   )
 
   return (
-    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[260svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
+    <section ref={section} className={`relative z-20 flex justify-center overflow-x-clip px-page text-white ${reduced ? 'py-24' : 'h-[320svh]'} md:h-auto md:pb-[clamp(120px,22vw,334px)] md:pt-[clamp(80px,16.67vw,252px)]`}>
       <div data-focus-frame className="absolute inset-x-0 bottom-0 top-0 bg-night" />
       {reduced ? (
         <h2 className="relative w-full max-w-[777px] text-center text-display font-medium leading-[1.28] tracking-[-0.006em]">{FOCUS_SENTENCE}</h2>
       ) : (
         <div className="sticky top-0 flex h-svh w-full items-center justify-center md:static md:h-auto md:items-start">
-        <h2 aria-label={FOCUS_SENTENCE} className="relative h-[1.28em] w-full max-w-[777px] text-[min(7.5vw,2.5rem)] font-medium md:text-display leading-[1.28] tracking-[-0.006em] will-change-transform">
+        <h2 aria-label={FOCUS_SENTENCE} className="relative h-[1.28em] w-full max-w-[777px] text-[28px] font-medium md:text-display leading-[1.28] tracking-[-0.006em] will-change-transform">
           <span data-focus-track aria-hidden="true" className="absolute left-1/2 top-0 flex w-max whitespace-pre will-change-transform">
             {FOCUS_LETTERS.map(({ char, italic, first }, index) => (
               <span key={index} data-focus-letter className={`inline-block text-center ${italic ? 'italic' : ''}`} style={{ opacity: first ? 1 : 0 }}>
@@ -439,35 +463,22 @@ function Philosophy() {
         gsap.fromTo('[data-philosophy-image]', { clipPath: 'inset(0 50%)' }, { clipPath: 'inset(0 0%)', ...OPEN_IMAGE, scrollTrigger })
       })
 
-      media.add('(max-width: 767.98px)', () => {
-        const section = scope.current
-        const overlap = () => {
-          section.style.marginTop = `${-section.offsetHeight}px`
-          ScrollTrigger.refresh()
-        }
-        const watcher = new ResizeObserver(overlap)
-        watcher.observe(section)
-
-        return () => {
-          watcher.disconnect()
-          section.style.marginTop = ''
-        }
-      })
-
       return () => media.revert()
     },
     { scope },
   )
 
+  // On phones Philosophy rises over the pinned Focus line. It overlaps Focus by a full screen; Collaboration
+  // and Community follow it above Focus too, so the line stays pinned until they have covered the whole screen.
   return (
-    <section ref={scope} className="flex flex-col items-center px-4 py-[104px] max-md:relative max-md:z-30 max-md:bg-page md:px-page md:py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
+    <section ref={scope} className="flex flex-col items-center px-4 py-[104px] max-md:relative max-md:z-30 max-md:bg-page max-md:motion-safe:-mt-[100svh] md:px-page md:py-24 lg:h-[633px] lg:py-0 lg:pt-[201px]">
       <p data-reveal data-philosophy className="w-full max-w-[15.48em] text-center text-[20px] md:text-h1 md:-translate-x-[8.5px] leading-[1.53] tracking-normal text-black">
         Everything I make starts with{' '}
         <br className="max-sm:hidden" />
         <span className="relative whitespace-pre font-script">
           minimalism
           <span data-philosophy-gap className="inline-block" style={{ width: PHILOSOPHY_GAP }} />
-          <img data-philosophy-image src={`${P}/minimalism.webp`} alt="" className="absolute right-[0.56em] top-0 h-[1.625em] w-[2.73em] max-w-none object-cover" />
+          <img data-philosophy-image src={`${P}/philosophy.webp`} alt="" className="absolute right-[0.56em] top-0 h-[1.625em] w-[2.73em] max-w-none object-cover" />
         </span>
         <wbr />
         so people{' '}
@@ -502,7 +513,7 @@ function LogoRow({ logos }) {
 
 function Collaboration() {
   return (
-    <section className="bg-void px-page py-20 text-white lg:h-[554px] lg:py-0 lg:pt-[104px]">
+    <section className="bg-void px-page py-20 text-white max-md:relative max-md:z-30 lg:h-[554px] lg:py-0 lg:pt-[104px]">
       <div data-reveal className="flex justify-center">
         {[1, 2, 3, 4].map((n) => (
           <img loading="lazy" decoding="async" key={n} src={`${P}/avatar-${n}.webp`} alt="" width="59" height="59" className="-ml-1.5 size-11 first:ml-0 md:-ml-2 md:size-[58.69px]" />
@@ -520,7 +531,7 @@ function Collaboration() {
 
 function Community() {
   return (
-    <section className="overflow-hidden bg-void px-page pb-20 pt-16 text-white lg:pb-[209px] lg:pt-[104px]">
+    <section className="overflow-hidden bg-void px-page pb-20 pt-16 text-white max-md:relative max-md:z-30 lg:pb-[209px] lg:pt-[104px]">
       <h2 data-reveal className="mx-auto max-w-[413px] text-center text-base leading-[1.2] md:text-h2">
         Communities I’ve built with
       </h2>
@@ -550,45 +561,49 @@ function Community() {
   )
 }
 
-function StarPiece() {
-  return <img loading="lazy" decoding="async" src={`${P}/hobby-star.webp`} alt="" draggable={false} className="absolute left-[6.27%] top-[4.91%] h-[84.83%] w-[87.46%]" />
-}
-
-function SquigglePiece() {
-  return <img src={`${P}/hobby-squiggle.svg`} alt="" draggable={false} className="absolute left-[-0.79%] top-[-3.95%] block h-[107.9%] w-[115.19%] max-w-none" />
-}
-
-function CoinPiece() {
+// The Figma stickers. Each sits in its node's box; the rotated ones turn inside a box sized for the turn.
+function GamepadArt() {
   return (
-    <>
-      <img src={`${P}/hobby-circle.svg`} alt="" draggable={false} className="absolute left-6 top-6 size-[35px]" />
-      <img src={`${P}/hobby-coin-1.svg`} alt="" draggable={false} className="absolute left-0 top-0 size-[50px]" />
-      <img src={`${P}/hobby-coin-2.svg`} alt="" draggable={false} className="absolute left-[5px] top-[5px] size-10" />
-      <img src={`${P}/hobby-dollar.svg`} alt="" draggable={false} className="absolute left-[18px] top-[11px]" />
-    </>
-  )
-}
-
-function MarkPiece() {
-  const diamonds = [[17.16, 8], [17.16, 25.3], [8.7, 16.44], [25.61, 16.44]]
-
-  return (
-    <div className="absolute inset-0 overflow-hidden rounded-[9px] bg-[#fd6e36]">
-      {diamonds.map(([left, top]) => (
-        <div key={`${left}-${top}`} className="absolute flex size-[13.667px] items-center justify-center" style={{ left, top }}>
-          <div className="size-[9.664px] -rotate-45 rounded-[2px] bg-[#301208]" />
-        </div>
-      ))}
+    <div className="flex size-full items-center justify-center">
+      <img src={`${P}/hobby-gamepad.svg`} alt="" draggable={false} className="block h-[83.7%] w-[90.19%] max-w-none -rotate-[9.53deg]" />
     </div>
   )
 }
 
+function SwirlArt() {
+  return <img src={`${P}/hobby-squiggle.svg`} alt="" draggable={false} className="absolute left-[-0.79%] top-[-3.95%] block h-[107.9%] w-[115.19%] max-w-none" />
+}
+
+function CoinArt() {
+  return <img src={`${P}/hobby-icon.svg`} alt="" draggable={false} className="block size-full" />
+}
+
+function BoltArt() {
+  return (
+    <div className="flex size-full items-center justify-center">
+      <div className="relative h-[80.54%] w-[75.35%] rotate-20">
+        <img src={`${P}/hobby-bolt.svg`} alt="" draggable={false} className="absolute left-0 top-[-0.29%] block h-[100.58%] w-full max-w-none" />
+      </div>
+    </div>
+  )
+}
+
+function BallArt() {
+  return <img src={`${P}/hobby-ball.svg`} alt="" draggable={false} className="block size-full" />
+}
+
+// Figma positions, in em of the 48px line and measured from the text box's top left (x 371, y 244 on the artboard).
+const HOBBY_STICKERS = [
+  { Art: GamepadArt, left: 444.12, top: -56, width: 84.482, height: 68.224 },
+  { Art: SwirlArt, left: 476, top: 108, width: 130.648, height: 101.156 },
+  { Art: CoinArt, left: 659, top: 150, width: 59, height: 59 },
+  { Art: BoltArt, left: 105, top: 104, width: 115.759, height: 122.69 },
+]
+const em = (px) => `${px / 48}em`
+
 const HOBBY_PIECES = [
-  // The star is a 146px bitmap, so it stops growing before it turns soft.
-  { Art: StarPiece, width: 83, height: 83, limit: 167 },
-  { Art: SquigglePiece, width: 130.648, height: 101.156 },
-  { Art: CoinPiece, width: 59, height: 59 },
-  { Art: MarkPiece, width: 48, height: 48 },
+  ...HOBBY_STICKERS,
+  { Art: BallArt, width: 36.25, height: 36.25 },
 ]
 const PIECE_POOL = [...HOBBY_PIECES, ...HOBBY_PIECES, ...HOBBY_PIECES]
 
@@ -610,6 +625,8 @@ const HOBBY_LINES = [
   { text: 'Football, Video Gaming, Fine Art', tone: 'text-black' },
   { text: 'Drawings, and Strategy Games.', tone: 'text-black' },
 ]
+// In Figma the "oo" of Football is two footballs set in the space of seven word spaces.
+const FOOTBALL_GAP = '       '
 const HOBBY_SENTENCE = HOBBY_LINES.map(({ text }) => text).join(' ')
 const SLICE_BANDS = ['inset(0 0 66% 0)', 'inset(34% 0 33% 0)', 'inset(67% 0 0 0)']
 const SPECKS = [[18, 108], [30, 118], [42, 104]]
@@ -624,7 +641,24 @@ const rgbSplit = (amount) => (amount
   ? `${-0.07 * amount}em 0 ${GLITCH_COLORS[1]}, ${0.07 * amount}em 0 ${GLITCH_COLORS[0]}, 0 ${0.05 * amount}em ${GLITCH_COLORS[3]}`
   : 'none')
 
+function FootballLabel() {
+  return (
+    <>
+      F
+      <span className="relative whitespace-pre">
+        {FOOTBALL_GAP}
+        <img src={`${P}/hobby-ball.svg`} alt="" className="absolute top-[0.3125em] size-[0.7552em] max-w-none" style={{ left: 'var(--ball-1)' }} />
+        <img src={`${P}/hobby-ball.svg`} alt="" className="absolute top-[0.3125em] size-[0.7552em] max-w-none" style={{ left: 'var(--ball-2)' }} />
+      </span>
+      tball,
+    </>
+  )
+}
+
 function GlitchWord({ word, index }) {
+  const football = word === 'Football,'
+  const ghost = football ? `F${FOOTBALL_GAP}tball,` : word
+
   const shards = [0, 1, 2].map((n) => {
     const r = (k) => seeded(index * 7 + n * 3 + k)
     return {
@@ -640,17 +674,17 @@ function GlitchWord({ word, index }) {
 
   return (
     <span data-word className="relative inline-block">
-      <span data-word-text>{word}</span>
+      <span data-word-text className="whitespace-pre">{football ? <FootballLabel /> : word}</span>
       <span data-shards aria-hidden="true" className="pointer-events-none invisible absolute inset-0">
         {shards.map((style, n) => (
           <span key={n} className="absolute" style={style} />
         ))}
-        <span className="absolute inset-0 text-white [-webkit-text-stroke:0.035em_#0a0a0a] [paint-order:stroke]">{word}</span>
+        <span className="absolute inset-0 whitespace-pre text-white [-webkit-text-stroke:0.035em_#0a0a0a] [paint-order:stroke]">{ghost}</span>
       </span>
       <span data-slices aria-hidden="true" className="pointer-events-none invisible absolute inset-0">
         {SLICE_BANDS.map((band, n) => (
-          <span key={band} data-slice className="absolute inset-0" style={{ clipPath: band, color: GLITCH_COLORS[(index + n + 1) % GLITCH_COLORS.length] }}>
-            {word}
+          <span key={band} data-slice className="absolute inset-0 whitespace-pre" style={{ clipPath: band, color: GLITCH_COLORS[(index + n + 1) % GLITCH_COLORS.length] }}>
+            {ghost}
           </span>
         ))}
         {SPECKS.map(([left, top]) => (
@@ -800,8 +834,10 @@ function Hobbies() {
   )
 
   return (
-    <section ref={scope} className="relative flex h-[clamp(320px,42vw,764px)] flex-col items-center justify-center px-page">
-      <p data-hobby-words className="text-center text-h3 font-medium md:text-[clamp(1.625rem,4.67vw,3rem)] leading-[1.28] tracking-[-0.03em]">
+    <section ref={scope} className="relative flex flex-col items-center px-page py-28 lg:pb-[132px] lg:pt-[244px]">
+      {/* Figma: 48px Regular, 1.4 leading, 0.96px tracking, a 771px box; stickers are placed in em so they scale with the line. */}
+      <div className="relative text-h3 md:text-[clamp(1.625rem,4.67vw,3rem)]">
+      <p data-hobby-words className="w-[16.0625em] max-w-full text-center leading-[1.4] tracking-[0.02em] [--ball-1:-0.0313em] [--ball-2:0.7656em]">
         <span className="sr-only">{HOBBY_SENTENCE}</span>
         {HOBBY_LINES.map(({ text: line, tone }, lineIndex) => {
           const before = HOBBY_LINES.slice(0, lineIndex).reduce((count, { text: earlier }) => count + earlier.split(' ').length, 0)
@@ -818,7 +854,13 @@ function Hobbies() {
           )
         })}
       </p>
-      <p data-reveal className="mt-8 text-base-lg leading-6 text-muted md:mt-[72px]">(Beyond Design)</p>
+        {HOBBY_STICKERS.map(({ Art, left, top, width, height }) => (
+          <div key={left} aria-hidden="true" className="pointer-events-none absolute" style={{ left: em(left), top: em(top), width: em(width), height: em(height) }}>
+            <Art />
+          </div>
+        ))}
+      </div>
+      <p data-reveal className="mt-8 text-base-lg leading-6 tracking-[0.02em] text-muted lg:mt-[89.6px]">(Beyond Design)</p>
       {/* Pieces fall in a screen-sized layer, so only the screen's edge can cut them off. */}
       <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
         {PIECE_POOL.map(({ Art, width, height, limit }, index) => (

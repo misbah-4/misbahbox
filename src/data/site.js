@@ -69,9 +69,10 @@ const draftTestimonials = import.meta.env.DEV
 
 export const testimonials = [...approvedTestimonials, ...draftTestimonials]
 
+// A work's thumbnail is its own `thumb` if set, otherwise the first image of its case study.
 export const works = [
   { name: 'Placeam', tags: 'digital, fashion, shopping' },
-  { name: 'Fleetkit', to: '/work/fleetkit', tags: 'digital, commercial, shopping' },
+  { name: 'Fleetkit', to: '/work/fleetkit', thumb: '/images/work/fleetkit-thumb.webp', tags: 'digital, commercial, shopping' },
   { name: 'Acemyx', tags: 'identity, digital, education' },
   { name: 'Placeam AI Studio', tags: 'digital, fashion, ai' },
   { name: 'Voomies', tags: 'digital, commercial, shopping' },
