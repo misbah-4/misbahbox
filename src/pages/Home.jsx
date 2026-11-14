@@ -191,7 +191,8 @@ function Intro() {
         <h1 className="text-h1 font-medium leading-[1.2] tracking-[0.01em] text-black">
           I’m a Product Designer / <span className="text-soft">Engineer.</span>
         </h1>
-        <p className="rounded-3xl bg-stone px-4 py-2 text-[16px] leading-[1.4] md:text-[18px] tracking-[0.02em] text-black">Open to work</p>
+        {/* Colours from the "+20%" pill in the wallet reference; the green is a shade darker to pass 4.5:1 contrast. */}
+        <p className="rounded-3xl bg-[#dcf9e4] px-4 py-2 text-[16px] leading-[1.4] md:text-[18px] tracking-[0.02em] text-[#317845]">Open to work</p>
       </div>
       <div data-reveal className="flex w-full max-w-[531px] flex-col items-start gap-8 lg:gap-12">
         <p className="text-body-lg leading-[1.4] tracking-[0.02em] text-black lg:h-[92px]">
@@ -199,7 +200,7 @@ function Intro() {
           <u className="decoration-from-font">mobile products</u> for startups, across commerce, AI, fashion and productivity tools.
         </p>
         <div className="tracking-[0.02em]">
-          <ArrowLink to="/profile">Know more about me</ArrowLink>
+          <ArrowLink href="https://concrete-insect-dc1.notion.site/About-Me-418d16188a5780a2a5ead827a5ab73d7?pvs=73">Know more about me</ArrowLink>
         </div>
       </div>
     </section>
@@ -222,7 +223,7 @@ const WORK_IMAGE = {
   ),
 }
 
-function WorkCard({ name, cta, to }) {
+function WorkCard({ name, cta, to, href }) {
   const image = (
     <div className="relative aspect-[541/375] w-full origin-bottom overflow-hidden transition-transform duration-300 ease-out group-hover/card:scale-[1.02]">
       {WORK_IMAGE[name]}
@@ -231,10 +232,12 @@ function WorkCard({ name, cta, to }) {
 
   return (
     <article className="group/card flex w-[min(84vw,541px)] shrink-0 flex-col items-center gap-6 lg:w-[541px]">
-      {to ? <Link to={to} aria-label={`${name} case study`} className="block w-full">{image}</Link> : image}
+      {to && <Link to={to} aria-label={`${name} case study`} className="block w-full">{image}</Link>}
+      {href && <a href={href} target="_blank" rel="noreferrer" aria-label={`${name} live site`} className="block w-full">{image}</a>}
+      {!to && !href && image}
       <div className="flex w-full items-center justify-between gap-4 px-4 max-md:*:text-[14px] md:*:text-[18px] lg:w-[461px] lg:px-0">
         <h3 className="text-base-lg font-medium uppercase leading-6 text-ink">{name}</h3>
-        <ArrowLink to={to}>{cta}</ArrowLink>
+        <ArrowLink to={to} href={href}>{cta}</ArrowLink>
       </div>
     </article>
   )
@@ -362,7 +365,7 @@ function BrandLogo({ brand, logo, width, height = 22, box, onSelect }) {
     >
       {logo
         ? <img src={logo} alt="" width={width} height={height} style={{ '--logo-h': `${height}px` }} className="max-sm:h-[calc(var(--logo-h)*0.7)] max-sm:w-auto" />
-        : <span className="font-medium uppercase tracking-[0.04em] text-black/20">{brand}</span>}
+        : <span className="font-bold uppercase tracking-[0.04em] text-black/20">{brand}</span>}
     </button>
   )
 }

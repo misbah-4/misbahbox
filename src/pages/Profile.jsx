@@ -128,8 +128,9 @@ function Intro() {
         const flip = flipThroughImages({ paused: true })
         let inView = true
         let grown = false
+        // Watch the section, not the card: the card rides in the scrolling content, which would offset its range.
         const viewport = ScrollTrigger.create({
-          trigger: card,
+          trigger: scope.current,
           start: 'top bottom',
           end: 'bottom top',
           onToggle: (self) => {
@@ -612,7 +613,8 @@ const SPAWN_GAP_MS = 90
 const GRAVITY = 3000
 const HOP = 70
 const MAX_TILT = 12
-const pieceSize = () => gsap.utils.clamp(64, 288, window.innerWidth * 0.16)
+// About the size of the stickers placed around the line (their longest side is 59–151px in Figma).
+const pieceSize = () => gsap.utils.clamp(48, 120, window.innerWidth * 0.08)
 const fallTime = (distance) => Math.sqrt((2 * Math.max(distance, 1)) / GRAVITY)
 
 // The page's own accents, used for the glitch instead of the reference's colours.
@@ -627,6 +629,12 @@ const HOBBY_LINES = [
 ]
 // In Figma the "oo" of Football is two footballs set in the space of seven word spaces.
 const FOOTBALL_GAP = '       '
+
+const IDLE_BOB = 4
+const IDLE_TILT = 3
+const IDLE_BEATS = [3.4, 4.1, 3.7, 4.6]
+const BALL_SPIN = 7
+const BALL_REST = 0.9
 const HOBBY_SENTENCE = HOBBY_LINES.map(({ text }) => text).join(' ')
 const SLICE_BANDS = ['inset(0 0 66% 0)', 'inset(34% 0 33% 0)', 'inset(67% 0 0 0)']
 const SPECKS = [[18, 108], [30, 118], [42, 104]]
@@ -647,8 +655,8 @@ function FootballLabel() {
       F
       <span className="relative whitespace-pre">
         {FOOTBALL_GAP}
-        <img src={`${P}/hobby-ball.svg`} alt="" className="absolute top-[0.3125em] size-[0.7552em] max-w-none" style={{ left: 'var(--ball-1)' }} />
-        <img src={`${P}/hobby-ball.svg`} alt="" className="absolute top-[0.3125em] size-[0.7552em] max-w-none" style={{ left: 'var(--ball-2)' }} />
+        <img data-ball="spin" src={`${P}/hobby-ball.svg`} alt="" className="absolute top-[0.3125em] size-[0.7552em] max-w-none" style={{ left: 'var(--ball-1)' }} />
+        <img data-ball="hop" src={`${P}/hobby-ball.svg`} alt="" className="absolute top-[0.3125em] size-[0.7552em] max-w-none origin-bottom" style={{ left: 'var(--ball-2)' }} />
       </span>
       tball,
     </>
@@ -820,7 +828,32 @@ function Hobbies() {
         },
       })
 
+      // Idle motion, like objects resting in water: each sticker bobs and tilts a little on its own slow beat.
+      const idle = gsap.utils.toArray('[data-sticker]', scope.current).map((sticker, index) =>
+        gsap.fromTo(
+          sticker,
+          { y: -IDLE_BOB, rotation: -IDLE_TILT },
+          { y: IDLE_BOB, rotation: IDLE_TILT, duration: IDLE_BEATS[index % IDLE_BEATS.length], ease: 'sine.inOut', repeat: -1, yoyo: true, delay: -index * 0.9 },
+        ),
+      )
+      // One football turns slowly; the other hops softly and settles with a slight squash.
+      const spin = gsap.to(scope.current.querySelector('[data-ball="spin"]'), { rotation: 360, duration: BALL_SPIN, ease: 'none', repeat: -1 })
+      const hop = gsap
+        .timeline({ repeat: -1, repeatDelay: BALL_REST })
+        .to('[data-ball="hop"]', { y: '-0.28em', duration: 0.42, ease: 'sine.out' })
+        .to('[data-ball="hop"]', { y: 0, duration: 0.42, ease: 'sine.in' })
+        .to('[data-ball="hop"]', { scaleY: 0.9, scaleX: 1.06, duration: 0.09, ease: 'sine.out' })
+        .to('[data-ball="hop"]', { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'back.out(2.5)' })
+      const motion = [...idle, spin, hop]
+      const onScreen = ScrollTrigger.create({
+        trigger: scope.current,
+        start: 'top bottom',
+        end: 'bottom top',
+        onToggle: (self) => motion.forEach((tween) => tween.paused(!self.isActive)),
+      })
+
       return () => {
+        onScreen.kill()
         inView.kill()
         typeIn.kill()
         flicker.kill()
@@ -855,7 +888,7 @@ function Hobbies() {
         })}
       </p>
         {HOBBY_STICKERS.map(({ Art, left, top, width, height }) => (
-          <div key={left} aria-hidden="true" className="pointer-events-none absolute" style={{ left: em(left), top: em(top), width: em(width), height: em(height) }}>
+          <div key={left} data-sticker aria-hidden="true" className="pointer-events-none absolute" style={{ left: em(left), top: em(top), width: em(width), height: em(height) }}>
             <Art />
           </div>
         ))}

@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- The SVG recolours itself with the light/dark setting; the PNGs cover browsers that don't recolour SVG favicons. -->
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-light.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-dark.png" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preload" href="/fonts/Neue%20Montreal/NeueMontreal-Regular.otf" as="font" type="font/otf" crossorigin />
     <link rel="preload" href="/fonts/Neue%20Montreal/NeueMontreal-Medium.otf" as="font" type="font/otf" crossorigin />

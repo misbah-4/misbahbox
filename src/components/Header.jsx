@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { nav, site } from '../data/site.js'
-import { scrollToTarget, setScrollLocked } from '../lib/motion.js'
+import { setScrollLocked } from '../lib/motion.js'
+import { openTalk } from './TalkDialog.jsx'
 
 const link = 'leading-[1.4] transition-opacity duration-200 hover:opacity-60'
 const reveal = 'block transition-transform duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none'
@@ -89,12 +90,11 @@ function Header() {
     setOpen(next)
   }
 
+  // Let's Talk opens the booking form. The mailto link stays as the fallback without JavaScript.
   const goToContact = (event) => {
-    setMenu(false)
-    const footer = document.getElementById('contact')
-    if (!footer) return
     event.preventDefault()
-    scrollToTarget(footer)
+    setMenu(false)
+    openTalk()
   }
 
   useEffect(() => {

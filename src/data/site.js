@@ -21,7 +21,7 @@ export const nav = [
 export const selectedWorks = [
   { name: 'placeam', cta: 'View Case Study' },
   { name: 'fleetkit', cta: 'View Case Study', to: '/work/fleetkit' },
-  { name: 'acemyx', cta: 'View Live Site' },
+  { name: 'acemyx', cta: 'View Live Site', href: 'https://acemyx.com/' },
 ]
 
 export const sideProjects = [

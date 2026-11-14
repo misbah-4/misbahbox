@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { gsap, prefersReducedMotion, ScrollTrigger, scrollToTarget, setLenis, useGSAP } from '../lib/motion.js'
 import Footer from './Footer.jsx'
 import Header from './Header.jsx'
+import TalkDialog from './TalkDialog.jsx'
 
 function Layout() {
   const { pathname } = useLocation()
@@ -57,6 +58,7 @@ function Layout() {
   return (
     <div className={`relative min-h-dvh ${pathname === '/' ? 'bg-page-warm' : 'bg-page'}`}>
       <Header />
+      <TalkDialog />
       <div ref={scope}>
         <main key={pathname}>
           <Outlet />
