@@ -68,7 +68,7 @@ function Hero() {
           />
         </div>
       </div>
-      <div className="mt-8 flex justify-center lg:absolute lg:right-[78px] lg:top-[508px] lg:mt-0">
+      <div className="mt-8 flex justify-center lg:absolute lg:inset-x-0 lg:top-[508px] lg:mt-0">
         <ArrowLink href="https://studione.world">(Building Studione )</ArrowLink>
       </div>
     </section>
