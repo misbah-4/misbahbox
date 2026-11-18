@@ -19,7 +19,7 @@ export const nav = [
 ]
 
 export const selectedWorks = [
-  { name: 'placeam', cta: 'View Case Study' },
+  { name: 'placeam', cta: 'View Case Study', to: '/work/placeam' },
   { name: 'fleetkit', cta: 'View Case Study', to: '/work/fleetkit' },
   { name: 'acemyx', cta: 'View Live Site', href: 'https://acemyx.com/' },
 ]
@@ -71,10 +71,13 @@ export const testimonials = [...approvedTestimonials, ...draftTestimonials]
 
 // A work's thumbnail is its own `thumb` if set, otherwise the first image of its case study.
 export const works = [
-  { name: 'Placeam', tags: 'digital, fashion, shopping' },
+  { name: 'Placeam', to: '/work/placeam', tags: 'digital, fashion, shopping' },
   { name: 'Fleetkit', to: '/work/fleetkit', thumb: '/images/work/fleetkit-thumb.webp', tags: 'digital, commercial, shopping' },
-  { name: 'Acemyx', tags: 'identity, digital, education' },
-  { name: 'Placeam AI Studio', tags: 'digital, fashion, ai' },
+  { name: 'Acemyx', to: '/work/acemyx', tags: 'identity, digital, education' },
+  { name: 'Placeam AI Studio', to: '/work/placeam-ai-studio', tags: 'digital, fashion, ai' },
+  { name: 'Placeam Cut and Shape', to: '/work/placeam-cut-and-shape', tags: 'digital, fashion, ai' },
+  { name: 'Placeam Pen', to: '/work/placeam-pen', tags: 'digital, fashion, ai' },
+  { name: 'Placeam Order Several', to: '/work/placeam-order-several', tags: 'digital, fashion, shopping' },
   { name: 'Voomies', tags: 'digital, commercial, shopping' },
   { name: 'Campusx', tags: 'digital, food & drink, shopping' },
 ]

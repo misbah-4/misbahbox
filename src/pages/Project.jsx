@@ -16,7 +16,14 @@ function Section({ heading, body, image, first }) {
           className={`mx-auto aspect-[756/405] w-full max-w-[756px] ${image.tight ? 'mt-12' : 'mt-16 lg:mt-24'}`}
           style={{ backgroundColor: image.bg }}
         >
-          <img loading="lazy" decoding="async" src={image.src} alt={image.alt} className="size-full object-cover" />
+          {image.src ? (
+            <img loading="lazy" decoding="async" src={image.src} alt={image.alt} className="size-full object-cover" />
+          ) : (
+            // Placeholder until the real screen is captured: a quiet box naming what will go here.
+            <div role="img" aria-label={image.alt} className="flex size-full items-center justify-center bg-stone p-6 text-center">
+              <span className="max-w-[28ch] text-[14px] leading-5 text-muted">{image.placeholder}</span>
+            </div>
+          )}
         </div>
       )}
     </>
@@ -39,7 +46,7 @@ function Project() {
       </div>
       <div className="mt-12">
         {project.sections.map((section, index) => (
-          <Section key={section.heading ?? 'intro'} first={index === 0} {...section} />
+          <Section key={`${index}-${section.heading ?? ''}`} first={index === 0} {...section} />
         ))}
       </div>
       <div className="h-20 lg:h-[207px]" />
