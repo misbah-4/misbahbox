@@ -23,8 +23,8 @@ export const projects = {
           "Four kinds of people come to Placeam.",
           "The creator has an idea and wants it made in their size, without the back-and-forth.",
           "The group or family buyer is dressing several people at once: aso-ebi, father-and-son sets, a bridal train.",
-          "The pre-owned buyer wants real luxury for less, and proof that it is genuine.",
-          "The seller wants a trusted place to reach all of them.",
+          "The shopper buys ready-made pieces from the Closet, or real luxury for less from Pre-Owned, and wants proof that a pre-owned piece is genuine.",
+          "The pre-owned seller owns luxury pieces they no longer wear, and wants a trusted place to sell them.",
           "Different as they are, they share the same three worries: will it fit, is my money safe, and who is responsible for my order.",
           "For the business, success is designs that become orders. Every outfit someone customises is work for a maker, and a reason to come back."
         ]
@@ -32,7 +32,7 @@ export const projects = {
       {
         "heading": "The Decision",
         "body": [
-          "Placeam is built for the phone, around five tabs. Home is for discovery. Pre-Owned holds members' luxury pieces, each authenticated by Placeam. The centre tab opens the Design Studio, where an AI assistant called Placy turns a description into a garment. The Closet is the shop. Profile keeps orders, measurements and listings."
+          "Placeam is built for the phone, around five tabs. Home is for discovery. Pre-Owned is where members sell their luxury pieces and others buy them, each piece authenticated by Placeam. The centre tab opens the Design Studio, where an AI assistant called Placy turns a description into a garment. The Closet is the shop. Profile keeps orders, measurements and listings."
         ],
         "image": {
           "alt": "The Closet with the tab bar",
