@@ -8,9 +8,9 @@ SRC = sys.argv[1]
 OUT = sys.argv[2]
 STUDIES = [
     ('placeam', 'placeam-overview.md'),
-    ('placeam-ai-studio', 'placeam-ai-studio-non-technical-users.md'),
+    ('placeam-design-studio', 'placeam-ai-studio-non-technical-users.md'),
     ('placeam-cut-and-shape', 'placeam-cut-tool.md'),
-    ('placeam-pen', 'placeam-pencil-tool.md'),
+    ('placeam-freehand-pen', 'placeam-pencil-tool.md'),
     ('placeam-order-several', 'placeam-bulk-variants.md'),
     ('fleetkit', 'fleetkit.md'),
     ('acemyx', 'acemyx.md'),
