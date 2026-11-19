@@ -186,7 +186,7 @@ function Showcase() {
 
 function Intro() {
   return (
-    <section className="mx-auto mt-16 flex max-w-[1512px] flex-col gap-10 px-page lg:mt-[176px] lg:flex-row lg:items-start lg:justify-between">
+    <section className="mx-auto mt-16 flex max-w-[1512px] flex-col gap-10 px-page lg:flex-row lg:items-start lg:justify-between">
       <div data-reveal className="flex w-full max-w-[644px] flex-col items-start gap-[34px]">
         <h1 className="text-h1 font-medium leading-[1.2] tracking-[0.01em] text-black">
           I’m a Product Designer / <span className="text-soft">Engineer.</span>
