@@ -8,9 +8,9 @@ export const projects = {
       {
         "body": [
           "Someone has an outfit in their head: an Ankara two-piece for a December wedding.",
-          "Getting it made usually means back-and-forth with a tailor. Choosing a fabric from its name is guessing. And one idea goes to one maker, one piece at a time.",
-          "Placeam closes that gap. Its home screen says it in three steps: \"Describe it. Design it. Have it made.\"",
-          "I designed the Design Studio's core tools, Cut and shape, the pen and Order several, working with a co-designer, a product manager and the founders."
+          "Getting it made usually means rounds of back-and-forth with a tailor. Choosing a fabric from its name is a guess. And every idea goes to one maker, one piece at a time.",
+          "Placeam brings that whole journey into one app. You describe the outfit, shape it with AI, and have a maker sew it in your size.",
+          "I designed Placeam alongside a co-designer, working closely with the product manager and the founders."
         ],
         "image": {
           "alt": "The Placeam home screen",
@@ -20,20 +20,19 @@ export const projects = {
       {
         "heading": "The Opportunity",
         "body": [
-          "Four people come to Placeam.",
-          "The first is the creator, whose job reads: \"Turn my idea into clothes I can actually wear, in my size, without back-and-forth with a tailor.\"",
-          "The second is the group or family buyer, ordering aso-ebi, father-and-son sets or a bridal train.",
-          "The third is the pre-owned buyer, who wants real luxury for less and proof that it is genuine.",
-          "The fourth is the seller.",
-          "All of them worry about the same three things: will it fit, is my money safe, and who is responsible for my order.",
-          "For the business, the Design Studio is the engine. It gets people customising their clothes, turns those designs into orders for makers, and gives people a reason to come back."
+          "Four kinds of people come to Placeam.",
+          "The creator has an idea and wants it made in their size, without the back-and-forth.",
+          "The group or family buyer is dressing several people at once: aso-ebi, father-and-son sets, a bridal train.",
+          "The pre-owned buyer wants real luxury for less, and proof that it is genuine.",
+          "The seller wants a trusted place to reach all of them.",
+          "Different as they are, they share the same three worries: will it fit, is my money safe, and who is responsible for my order.",
+          "For the business, success is designs that become orders. Every outfit someone customises is work for a maker, and a reason to come back."
         ]
       },
       {
         "heading": "The Decision",
         "body": [
-          "Placeam is an installable web app made for the phone.",
-          "Five tabs hold its jobs. Home is for discovery. Pre-Owned shows members' luxury pieces, authenticated by Placeam's own team. The centre tab opens the Design Studio, where Placy turns a description into a garment. The Closet is the shop. Profile keeps orders, measurements and listings."
+          "Placeam is built for the phone, around five tabs. Home is for discovery. Pre-Owned holds members' luxury pieces, each authenticated by Placeam. The centre tab opens the Design Studio, where an AI assistant called Placy turns a description into a garment. The Closet is the shop. Profile keeps orders, measurements and listings."
         ],
         "image": {
           "alt": "The Closet with the tab bar",
@@ -42,18 +41,23 @@ export const projects = {
       },
       {
         "body": [
-          "Four bets sit under it.",
-          "The first is that an edit beats a new generation. Once a look exists, every change runs as an edit of the same garment, so the look stays consistent.",
-          "The second is honesty about what AI makes. The image is a design reference. The maker confirms fabric, measurements, price and date before anything is cut, and Placeam holds the payment until the buyer confirms delivery.",
-          "The third is that Nigerian traditional wear comes first. The fabric library opens on traditional fabrics for traditional designs, and price tiers follow Lagos market prices per yard.",
-          "The fourth is focus. The first release leaves out the Fashion House and gives its place to Pre-Owned.",
-          "Next, Placeam goes into usability testing."
+          "Four bets shape the product.",
+          "The first is that an edit beats a new generation. Once a look exists, every change is an edit of the same garment, so the design stays consistent from first idea to final order.",
+          "The second is honesty about what AI can show. A generated image is a design reference, not a promise. The maker confirms fabric, measurements, price and date before anything is cut, and Placeam holds the payment until the buyer confirms delivery.",
+          "The third is that Nigerian traditional wear comes first. The fabric library leads with traditional fabrics, and prices follow Lagos market rates per yard.",
+          "The fourth is focus. The first release leaves the Fashion House out and gives its place to Pre-Owned, so every tab earns its spot."
         ]
       },
       {
-        "heading": "Where The Detail Lives",
+        "heading": "The Trade-off",
         "body": [
-          "Four deeper studies pick up from here. One follows a person through the Design Studio, from a first description to a garment ordered from a maker. One looks at Cut and shape, which changes a silhouette, neckline, sleeve or hem. One covers the freehand pen, for pointing at the part to change. And one covers Order several, which sends several variations to one maker as one brief."
+          "Buyers accept that the picture is a starting point, not a guarantee, and makers are paid on delivery rather than up front. In return, both sides get what the old way never gave them: a clear order, a confirmed fit, and someone responsible when something goes wrong."
+        ]
+      },
+      {
+        "heading": "What's Next",
+        "body": [
+          "Placeam goes into usability testing next."
         ]
       }
     ]
@@ -79,7 +83,7 @@ export const projects = {
         "heading": "The Opportunity",
         "body": [
           "Placeam is a fashion app where you describe an outfit, an assistant called Placy designs it, and a maker sews it in your size.",
-          "The person this flow is for wants to \"turn my idea into clothes I can actually wear, in my size, without back-and-forth with a tailor.\" They have taste. What they lack is the words.",
+          "The people this flow is for know what they want to wear. They have taste. What they lack is the words.",
           "For the business, that gap matters. Every person who gets stuck is a design that never becomes an order."
         ]
       },
@@ -100,7 +104,7 @@ export const projects = {
       {
         "heading": "The Decision",
         "body": [
-          "The studio starts by asking for nothing technical. The prompt box asks for \"the outfit, the occasion, the fabric, the feeling, whatever's in your head right now\", and a reference picture can stand in for words.",
+          "The studio starts by asking for nothing technical: the outfit, the occasion, the fabric, the feeling. A reference picture can stand in for words.",
           "Once a look is on the canvas, two tools close the vocabulary gap.",
           "The first is pointing. A pen lets the person tap a part or draw a loop around any area. A \"Change to\" button appears beside it, and a small box asks them to describe that part. On the dashiki, tapping the pocket gives \"Describe the pocket…\". They never had to name it."
         ],
@@ -121,7 +125,7 @@ export const projects = {
       {
         "body": [
           "Every edit is kept in History, named by the change that made it, so stepping back is always one tap away.",
-          "When the look is right, Order opens Get it made: measurements, a brief, a maker, then review and pay. The brief's example note is written the way people talk: \"Modest neckline, pockets in the skirt, wedding on 14 December\".",
+          "When the look is right, ordering takes four steps: measurements, a short brief in the person's own words, a maker, then review and pay.",
           "Three reasons sit behind it.",
           "The first is that it needs no tailoring words. People point at a part, or pick its new shape from a drawing.",
           "The second is that it is guided. People fix the garment by hand instead of rewriting a prompt.",
@@ -131,7 +135,7 @@ export const projects = {
       {
         "heading": "The Trade-off",
         "body": [
-          "Before paying, the buyer confirms one line: \"I understand the image is a design reference. My maker will confirm fabric, construction and fit with me before cutting.\" Placeam holds the payment until delivery is confirmed.",
+          "Before paying, the buyer confirms they understand the image is a design reference, and that their maker will confirm fabric, construction and fit before cutting. Placeam holds the payment until delivery is confirmed.",
           "So the person gives up an exact, final picture. In return, they never need the tailoring vocabulary, because the maker, who has it, confirms every detail before anything is cut."
         ]
       },
@@ -166,7 +170,7 @@ export const projects = {
           "A garment is mostly its shape.",
           "Two tops in the same fabric and the same colour can be different clothes. One has a V-neck and a straight hem. The other has puff sleeves and a hem that drops at the back.",
           "If the neckline is wrong, the obvious move is to type a new prompt. But the part that was right can change along with the part that was wrong, and the look drifts away from what the person wanted.",
-          "The person Placeam is built for wants to \"turn my idea into clothes I can actually wear, in my size, without back-and-forth with a tailor.\" Neckline, sleeve and hem are exactly what that back-and-forth is usually about.",
+          "People come to Placeam to get clothes made in their size without the back-and-forth of a tailor's fitting room. Neckline, sleeve and hem are exactly what that back-and-forth is usually about.",
           "I designed Cut and shape end to end, and took it through review with the product manager and the founders."
         ]
       },
@@ -489,8 +493,8 @@ export const projects = {
           "That left three jobs: pay a stranger safely, see the real garment, and know the item is yours."
         ],
         "image": {
-          "alt": "The Fleetkit mobile web home screen",
-          "placeholder": "The Fleetkit mobile web home screen"
+          "alt": "The Fleetkit home screen",
+          "placeholder": "The Fleetkit home screen"
         }
       },
       {
@@ -553,7 +557,7 @@ export const projects = {
       {
         "heading": "The Opportunity",
         "body": [
-          "AcemyX is an online platform that helps learners prepare for university admission exams, with personal plans, curated resources and self-paced learning. One heading on the site holds the whole idea: \"Navigating Entrance Exams Shouldn't Be a Barrier.\"",
+          "AcemyX helps learners prepare for university admission exams, with personal plans, curated resources and self-paced learning. The idea behind it is simple: an entrance exam should not be a barrier.",
           "The user is a student with an exam date and a school in mind. Three needs shaped the product.",
           "The first is knowing where to focus. Each student gets a personal plan built around their goals, and tools that show where effort will gain the most points.",
           "The second is practising under real conditions. Expert questions and full mock exams come with progress tracking, so a student can see whether the work is paying off.",
@@ -582,7 +586,7 @@ export const projects = {
           "A product like this asks two things of design.",
           "The identity has to earn trust twice: from a student deciding whether N500 is worth it, and from an institution deciding whether to put its name beside it.",
           "The digital side has to make a plan, a mock exam and a progress report readable to someone studying alone, often for the first time.",
-          "The website is live. Next on the product roadmap is measuring the full journey, from a student's first visit to a paid plan, so every part of it can be improved."
+          "Next on the roadmap is measuring the full journey, from a student's first visit to a paid plan, so every part of it can be improved."
         ]
       }
     ]
