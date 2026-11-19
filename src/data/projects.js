@@ -53,12 +53,6 @@ export const projects = {
         "body": [
           "Buyers accept that the picture is a starting point, not a guarantee, and makers are paid on delivery rather than up front. In return, both sides get what the old way never gave them: a clear order, a confirmed fit, and someone responsible when something goes wrong."
         ]
-      },
-      {
-        "heading": "What's Next",
-        "body": [
-          "Placeam goes into usability testing next."
-        ]
       }
     ]
   },
@@ -71,8 +65,7 @@ export const projects = {
           "A tailor can say \"bishop sleeve, jewel neck, high-low hem\" and be understood.",
           "Most people who want clothes made cannot. But they can point.",
           "Asking for a change to a garment takes two things: naming the part, and naming what it should become. Without the vocabulary, people are stuck on both.",
-          "I designed the Placeam Design Studio's editing tools so anyone with taste can make a precise change and have the garment made, without knowing a single tailoring term.",
-          "Next, it goes into usability testing."
+          "I designed the Placeam Design Studio's editing tools so anyone with taste can make a precise change and have the garment made, without knowing a single tailoring term."
         ],
         "image": {
           "alt": "The studio before anything is made",
@@ -155,8 +148,7 @@ export const projects = {
         "body": [
           "In an AI fashion studio, fixing the shape of a garment usually means typing a new prompt. And a new prompt makes a new garment.",
           "Cut and shape lets people restyle a garment by choosing instead of typing: pick a part, pick its new shape, and keep everything else.",
-          "It is the main styling tool in the Placeam Design Studio. It breaks a garment into four parts, offers each as a set of drawn options, and keeps every change as a version. For the business, it turns browsing into designing, and designing into orders for makers.",
-          "Next, it goes into usability testing."
+          "It is the main styling tool in the Placeam Design Studio. It breaks a garment into four parts, offers each as a set of drawn options, and keeps every change as a version. For the business, it turns browsing into designing, and designing into orders for makers."
         ],
         "image": {
           "alt": "The Design Studio with Cut and shape open on the batik dashiki, measurements drawn over the garment and the four-part bar above the tool row",
@@ -257,8 +249,7 @@ export const projects = {
           "Neckline. Sleeve. Hem.",
           "Others do not. The patch under the pocket. The strip where two prints meet. The corner of a panel that sits a little too wide.",
           "In the Placeam Design Studio, Cut and shape changes a garment through its four named parts. But someone who wants to change a part with no name has no button for it, and typing a new prompt would redraw the whole garment.",
-          "I designed the pen for everything the names leave out: draw around any area, say what should change, and only that area changes.",
-          "Next, it goes into usability testing."
+          "I designed the pen for everything the names leave out: draw around any area, say what should change, and only that area changes."
         ],
         "image": {
           "alt": "The Design Studio with the pen switched on in Cut and shape, the dashiki shown as a white outline with dashed seam lines and a yellow loop being drawn",
@@ -338,8 +329,7 @@ export const projects = {
         "body": [
           "The Placeam Design Studio was built for one person and one outfit.",
           "A lot of Nigerian dressing is not like that. Aso-ebi, father-and-son sets and bridal trains all start from one look and end as several pieces, each for a different body.",
-          "I designed Order several so one look can become a matching set: up to ten variations, each sized for a different person, sent to one maker as one brief.",
-          "Next, it goes into usability testing."
+          "I designed Order several so one look can become a matching set: up to ten variations, each sized for a different person, sent to one maker as one brief."
         ]
       },
       {
@@ -529,8 +519,7 @@ export const projects = {
       {
         "heading": "Learnings",
         "body": [
-          "Leaving bale quality out of the first version kept the design focused on the moment buyers and sellers actually meet.",
-          "Next, Fleetkit goes into usability testing with buyers and vendors."
+          "Leaving bale quality out of the first version kept the design focused on the moment buyers and sellers actually meet."
         ],
         "image": {
           "alt": "A hand holding a phone that shows \"The Closet Edit\" story screen, on a lime background",
